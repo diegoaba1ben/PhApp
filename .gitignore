@@ -1,0 +1,176 @@
+# Archivos y directorios que nodeben ser verisonados
+
+# .gitignore
+# Archivos ASP.NET
+bin/
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.vs/
+*.sln
+
+# Archivos Angular
+node_modules/
+dist/
+tmp/
+out-tsc/
+build/
+*.ts
+*.tsc
+*.js
+*.jspm_packages
+*.html
+*.css
+*.class
+dist/
+
+# Archivos React
+*.jsx
+*.js
+*.html 
+*.css
+build/
+node_modules/
+
+# Archivos de compilación y distribución
+*.vue
+*.js
+*.html
+*.css
+dist/
+node_modules/
+
+# Django(Python)
+settings.py
+*.sqlite3 
+*.log
+media/
+static/
+
+# Rails (Ruby)
+config/database.yml
+tmp/
+log/
+public/
+vendor/bundle/
+
+# Archivos IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Archivos Logs
+logs/
+*.log 
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environments
+.env 
+.env.local 
+.env.*.local
+
+# Runtime data
+pids/
+*.pid 
+*.seed
+*.pid.lock
+
+# Coverage reports
+coverage/
+*.lcov
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Miscellaneous
+.DS_Store
+*.pem
+*.pub
+
+# Docker
+Dockerfile
+docker-compose.yml
+
+# Archivos de sistema
+Thumbs.db 
+*.DS_Store
+.git
+
+# Archivos de configuración específicos
+*.bak
+*.old
+*.psd 
+*.tmp
+
+# Archivos de registro y salida
+*.err 
+*.out 
+
+# Archivos de compilación y cache
+*.cache
+*.class
+*.pyc
+
+# Archivos de prueba
+*.spec 
+*.spechelper.rb
+
+# Directorios específicos
+/vendor/
+/test/
+
+# Compresores
+*.zip
+*.rar
+
+# Archivos de base de datos SQLite
+*.db
+*.sqlite
+*.sqlite3
+
+# Archivos de base de datos MySQL
+*.sql 
+*.myd
+*.myi
+
+# Archivos de base de datos PostgreSQL
+*.sql 
+*.pgdump
+*.log 
+
+# Archivos de base de datos MongoDB
+*.bson
+*.mongodump
+
+# Archivos de base de datos Oracle
+*.dbf
+*.log
+*.trc
+
+# Directorios de bases de datos
+db/
+data/
+var/lib/mysql 
+pg_data/
+oradata/
+bdump/
+admin/
+
+# Bibliotecas y ejecutables
+*.exe
+*.dll
+
+# Configuración de servidores
+web.config 
+nginx.conf 
+
+# Archivos de estado de la aplicación 
+appstate
+sessionstate

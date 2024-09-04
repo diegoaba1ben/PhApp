@@ -5,21 +5,18 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace PhAppUser.Domain.Entities
 {
     /// <summary>
-    /// Representa un cargo dentro de la copropiedad, donde pueden existir varios cargos en el organigrama
-    /// de la copropiedad. El cargo correspondiente al Representante Legal debe ser tratado de manera
-    /// única y especial.
+    /// Clase que agrupa los permisos de forma lógica para facilitar la gestión, la jerarquía y la seguridad.
     /// </summary>
-    public class Cargo
+    public class Categoria
     {
         /// <summary>
-        /// Identificador único del cargo.
+        /// Identificador único de la categoría.
         /// </summary>
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; } 
+        public int Id { get; set; }
 
         /// <summary>
-        /// Nombre del cargo.
+        /// Nombre de la categoría dentro del sistema.
         /// </summary>
         [Required(ErrorMessage = "El nombre es obligatorio.")]
         [StringLength(30, MinimumLength = 3, ErrorMessage = "El nombre debe tener entre 3 y 30 caracteres.")]
@@ -27,7 +24,7 @@ namespace PhAppUser.Domain.Entities
         public string Nombre { get; set; }
 
         /// <summary>
-        /// Descripción detallada del cargo.
+        /// Descripción completa de la categoría en el sistema.
         /// </summary>
         [Required(ErrorMessage = "La descripción es obligatoria.")]
         [StringLength(50, MinimumLength = 10, ErrorMessage = "La descripción debe tener entre 10 y 50 caracteres.")]
@@ -35,26 +32,24 @@ namespace PhAppUser.Domain.Entities
         public string Descripcion { get; set; }
 
         /// <summary>
-        /// Lista de documentos de representación legal asociados a este cargo.
+        /// Lista de permisos asociados con esta categoría.
         /// </summary>
-        public ICollection<RepLegal> RepresentantesLegales { get; set; } = new List<RepLegal>();
-
-        /// <summary>
-        /// Lista de perfiles asociados a este cargo.
-        /// </summary>
-        public ICollection<PerfilUsuario> Perfiles { get; set; } = new List<PerfilUsuario>();
+        public ICollection<Permiso> Permisos { get; set; } = new List<Permiso>();
 
         // Constructores
         /// <summary>
-        /// Constructor con parámetros para inicializar nombre y descripción.
+        /// Constructor por defecto.
         /// </summary>
-        public Cargo(string nombre, string descripcion)
+        public Categoria() { }
+
+        /// <summary>
+        /// Constructor con parámetros.
+        /// </summary>
+        public Categoria(string nombre, string descripcion)
         {
             Nombre = nombre;
             Descripcion = descripcion;
         }
     }
 }
-
-
 

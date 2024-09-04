@@ -1,83 +1,97 @@
-using system;
-using System.DataAnnotations;
+using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace PhAppUser.Domain.Entities;
+namespace PhAppUser.Domain.Entities
 {
+    /// <summary>
+    /// Representa el documento de representación legal asociado a un usuario.
+    /// </summary>
     public class RepLegal
     {
         /// <summary>
-        /// Representa la entidad para la validación de la certificación legal del usuario
+        /// Identificador único del representante legal.
         /// </summary>
-        
-        public class ValidRepLegal
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Id { get; set; }
+
+        /// <summary>
+        /// Fecha de expedición del documento de representación legal.
+        /// </summary>
+        [Required]
+        [DataType(DataType.Date)]
+        [CustomValidation(typeof(RepLegal), nameof(ValidarFechaExpedicion))]
+        public DateTime FechaExpedicion { get; set; }
+
+        public static ValidationResult ValidarFechaExpedicion(DateTime fechaExpedicion, ValidationContext context)
         {
-            /// <summary>
-            /// Obtiene o establece el identificador único de la validación
-            /// </summary>
-            [Key]
-            public int Id { get; set; }
-
-            /// <summary>
-            /// Obtiene o establece la fecha en que se establece la fecha en la que se emitió la certificación legal
-            /// </summary>
-            [Required]
-            public DateTime FechaEmision { get; set; }
-
-            /// <summary>
-            /// Obtiene la fecha de exporación de la certificación  legal (365 días después de la fecha de certificación)
-            /// Calcula años bisisestos
-            /// </summary>
-            public DateTime FechaExpiracion
+            if (fechaExpedicion > DateTime.Now)
             {
-                get 
-                {
-                    return FechaCert.AddDays(IsLeapYear(FechaEmision.Year)? 366:365);
-                }
+                return new ValidationResult("La fecha de expedición no puede ser posterior a la fecha actual");
             }
+            return ValidationResult.Success;
+        }
 
-            /// <summary>
-            /// Obtiene o establece el estado del usuario (true Si las credenciales están activas).
-            /// </summary>
-            public bool EstadoUsuario { get; set;}
+        /// <summary>
+        /// Entidad emisora del documento.
+        /// </summary>
+        [Required]
+        [StringLength(50)]  // Longitud máxima de 50 caracteres para asegurar la consistencia
+        public string AlcaldiaEmisora { get; set; }
 
-            /// <summary>
-            /// Indica si el usuario es nuevo  o si es una renovación de la certificación.
-            /// Si esnuevo, se abrirá una interfaz de usuario completa, si es una renovación se permitirán actualizaciones
-            /// </summary>
-            public bool EsNvoUsuario { get; set;}
+        /// <summary>
+        /// Relación con la entidad Cargo que indica el rol asociado a este documento.
+        /// </summary>
+        [Required]
+        public int CargoId { get; set; }
 
-            /// <summary>
-            /// Calcula si la fecha de expiración está dentro de los 30 dían anteriores a la certificación
-            /// </summary>
-            public bool Aviso30Dias
-            {
-                get
-                {
-                    return(FechExp - DateTime.Now).TotalDays <= 30;
-                }
-            }
+        [ForeignKey("CargoId")]
+        public Cargo Cargo { get; set; }
 
-            /// <summary>
-            /// Calcula si la fecha está dentro de los 15 días antes de la expiración
-            /// </summary>
-            public bool Aviso15Dias
-            {
-                get
-                {
-                    return(FechaExp - DateTime.Now).TotalDays <= 15;
-                }
-            }
+        /// <summary>
+        /// Indica si el usuario está activo como representante legal.
+        /// </summary>
+        public bool EsRepresentanteLegal { get; set; }
 
-            /// <summary>
-            /// Calcula si la fecha está dentro de los 8 días antes de la expiración
-            /// </summary>
-            public bool Aviso8Dias
-            {
-                get{
-                    return(FechaExp - DateTime.Now).TotalDays <= 8;
-                }
-            }
+        /// <summary>
+        /// Constructor vacío necesario para Entity Framework.
+        /// </summary>
+        public RepLegal() {}
 
+        /// <summary>
+        /// Constructor para inicializar un representante legal con los valores especificados.
+        /// </summary>
+        public RepLegal(DateTime fechaExpedicion, string alcaldiaEmisora, bool esRepresentanteLegal, int cargoId)
+        {
+            FechaExpedicion = fechaExpedicion;
+            AlcaldiaEmisora = alcaldiaEmisora;
+            EsRepresentanteLegal = esRepresentanteLegal;
+            CargoId = cargoId;
+        }
+
+        /// <summary>
+        /// Calcula la fecha de vencimiento basada en la fecha de expedición (1 año calendario por defecto).
+        /// </summary>
+        public DateTime ObtenerFechaVencimiento()
+        {
+            return FechaExpedicion.AddYears(1);
+        }
+
+        /// <summary>
+        /// Calcula los días restantes hasta el vencimiento del documento.
+        /// </summary>
+        public int CalcularDiasRestantes()
+        {
+            return (ObtenerFechaVencimiento() - DateTime.Now).Days;
+        }
+
+        /// <summary>
+        /// Verifica si el documento ya está vencido.
+        /// </summary>
+        public bool EsDocumentoVencido()
+        {
+            return DateTime.Now > ObtenerFechaVencimiento();
         }
     }
-} 
+}

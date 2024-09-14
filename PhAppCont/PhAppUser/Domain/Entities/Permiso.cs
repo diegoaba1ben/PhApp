@@ -21,7 +21,7 @@ namespace PhAppUser.Domain.Entities
         [Required(ErrorMessage = "El nombre es obligatorio.")]
         [StringLength(30, MinimumLength = 3, ErrorMessage = "El nombre debe tener entre 3 y 30 caracteres.")]
         [RegularExpression(@"^[a-zA-Z0-9\s]+$", ErrorMessage = "El nombre solo puede contener letras y números.")]
-        public string Nombre { get; set; }
+        public required string Nombre { get; set; }
 
         /// <summary>
         /// Descripción completa del permiso.
@@ -29,13 +29,13 @@ namespace PhAppUser.Domain.Entities
         [Required(ErrorMessage = "La descripción es obligatoria.")]
         [StringLength(50, MinimumLength = 10, ErrorMessage = "La descripción debe tener entre 10 y 50 caracteres.")]
         [RegularExpression(@"^[a-zA-Z0-9\s]+$", ErrorMessage = "La descripción solo puede contener letras y números.")]
-        public string Descripcion { get; set; }
+        public required string Descripcion { get; set; }
 
         /// <summary>
         /// Identificador de la categoría a la que pertenece el permiso.
         /// </summary>
         [Required]
-        public int CategoriaId { get; set; }
+        public required int CategoriaId { get; set; }
 
         /// <summary>
         /// Muestra el estado de activo o inactivo del permiso.
@@ -51,21 +51,25 @@ namespace PhAppUser.Domain.Entities
         /// Categoría a la que pertenece el permiso.
         /// </summary>
         [ForeignKey("CategoriaId")]
-        public Categoria Categoria { get; set; }
+        [Required]
+        public required Categoria Categoria { get; set; }
 
-        // Constructores
         /// <summary>
-        /// Constructor por defecto.
+        /// Constructor vacío requerido por EF Core
         /// </summary>
-        public Permiso() { }
+        public Permiso()
+        {
+            
+        }
 
         /// <summary>
         /// Constructor con parámetros.
         /// </summary>
-        public Permiso(string nombre, string descripcion)
+        public Permiso(string nombre, string descripcion, Categoria categoria)
         {
             Nombre = nombre;
             Descripcion = descripcion;
+            Categoria = categoria;
         }
     }
 }

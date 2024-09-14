@@ -13,7 +13,6 @@ namespace PhAppUser.Domain.Entities
         /// <summary>
         /// Identificador único del usuario asociado al perfil, clave compuesta
         /// </summary>
-        [Key, Column(Order = 0)]
         [Required]
         public int UsuarioId { get; set; }
         public Usuario Usuario { get; set; }
@@ -21,7 +20,6 @@ namespace PhAppUser.Domain.Entities
         /// <summary>
         /// Identificador del cargo asociado al perfil
         /// </summary>
-        [Key, Column(Order = 1)]
         [Required]
         public int CargoId { get; set; }
         public Cargo Cargo { get; set; }
@@ -33,11 +31,23 @@ namespace PhAppUser.Domain.Entities
         public ICollection<Permiso> Permisos { get; set; }  
 
         /// <summary>
-        /// Constructor vacío necesario para Entity Framework
+        /// Constructor vacío requerido por EF Core
         /// </summary>
         public PerfilUsuario()
         {
-            Permisos = new HashSet<Permiso>();
+            
+        }
+
+        /// <summary>
+        /// Constructor con parámetros
+        /// </summary>
+        public PerfilUsuario(int usuarioId, Usuario usuario, int cargoId, Cargo cargo, ICollection<Permiso> permisos)
+        {
+            UsuarioId = usuarioId;
+            Usuario = usuario;
+            CargoId = cargoId;
+            Cargo = cargo;
+            Permisos = permisos ?? new HashSet<Permiso>(); 
         }
     }
 }

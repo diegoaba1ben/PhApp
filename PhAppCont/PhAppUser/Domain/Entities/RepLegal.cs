@@ -17,81 +17,85 @@ namespace PhAppUser.Domain.Entities
         public int Id { get; set; }
 
         /// <summary>
-        /// Fecha de expedición del documento de representación legal.
-        /// </summary>
-        [Required]
-        [DataType(DataType.Date)]
-        [CustomValidation(typeof(RepLegal), nameof(ValidarFechaExpedicion))]
-        public DateTime FechaExpedicion { get; set; }
-
-        public static ValidationResult ValidarFechaExpedicion(DateTime fechaExpedicion, ValidationContext context)
-        {
-            if (fechaExpedicion > DateTime.Now)
-            {
-                return new ValidationResult("La fecha de expedición no puede ser posterior a la fecha actual");
-            }
-            return ValidationResult.Success;
-        }
-
-        /// <summary>
         /// Entidad emisora del documento.
         /// </summary>
         [Required]
         [StringLength(50)]  // Longitud máxima de 50 caracteres para asegurar la consistencia
-        public string AlcaldiaEmisora { get; set; }
+        public required string AlcaldiaEmisora { get; set; }
 
         /// <summary>
         /// Relación con la entidad Cargo que indica el rol asociado a este documento.
         /// </summary>
         [Required]
-        public int CargoId { get; set; }
+        public required int CargoId { get; set; }
 
         [ForeignKey("CargoId")]
-        public Cargo Cargo { get; set; }
+        public required Cargo Cargo { get; set; }
 
         /// <summary>
-        /// Indica si el usuario está activo como representante legal.
+        /// Fecha de expedición del documento de representación legal.
         /// </summary>
-        public bool EsRepresentanteLegal { get; set; }
+        [Required]
+        [DataType(DataType.Date)]
+        [CustomValidation(typeof(RepLegal), nameof(ValidarFechaExpedicion))]
+        public required DateTime FechaExpedicion { get; set; }
 
-        /// <summary>
-        /// Constructor vacío necesario para Entity Framework.
-        /// </summary>
-        public RepLegal() {}
-
-        /// <summary>
-        /// Constructor para inicializar un representante legal con los valores especificados.
-        /// </summary>
-        public RepLegal(DateTime fechaExpedicion, string alcaldiaEmisora, bool esRepresentanteLegal, int cargoId)
+        public static ValidationResult ValidarFechaExpedicion(DateTime fechaExpedicion)
         {
-            FechaExpedicion = fechaExpedicion;
-            AlcaldiaEmisora = alcaldiaEmisora;
-            EsRepresentanteLegal = esRepresentanteLegal;
-            CargoId = cargoId;
+            
+            if(fechaExpedicion > DateTime.Now)
+            {
+                return new ValidationResult("La fecha de expedición no puede ser posterior a la fecha actual");
+            }
+            return ValidationResult.Success ?? new ValidationResult("Validación exitosa");
         }
 
         /// <summary>
-        /// Calcula la fecha de vencimiento basada en la fecha de expedición (1 año calendario por defecto).
+        /// Calcula la fecha de vencimiento basada en la fecha de expedición.
+        /// Esta fecha debe ser proporcionada manualmente según lo autorizado.
         /// </summary>
-        public DateTime ObtenerFechaVencimiento()
-        {
-            return FechaExpedicion.AddYears(1);
-        }
+       [Required]
+       [DataType(DataType.Date)]
+       public required DateTime FechaVencimiento { get; set; }
+
 
         /// <summary>
         /// Calcula los días restantes hasta el vencimiento del documento.
         /// </summary>
         public int CalcularDiasRestantes()
         {
-            return (ObtenerFechaVencimiento() - DateTime.Now).Days;
+            return (FechaVencimiento - DateTime.Now).Days;
         }
 
-        /// <summary>
+         /// <summary>
         /// Verifica si el documento ya está vencido.
         /// </summary>
         public bool EsDocumentoVencido()
         {
-            return DateTime.Now > ObtenerFechaVencimiento();
+            return DateTime.Now > FechaVencimiento;
         }
+
+        /// <summary>
+        /// Constructor vacío requerido por EF Core
+        /// </summary>
+        public RepLegal()
+        {
+            
+        }
+
+        /// <summary>
+        /// Constructor para inicializar un representante legal con los valores especificados.
+        /// </summary>
+        public RepLegal(DateTime fechaExpedicion, DateTime fechaVencimiento,  string alcaldiaEmisora, int cargoId, Cargo cargo)
+        {
+            FechaExpedicion = fechaExpedicion;
+            FechaVencimiento = fechaVencimiento; 
+            AlcaldiaEmisora = alcaldiaEmisora;
+            CargoId = cargoId;
+            Cargo = cargo ?? throw new ArgumentNullException(nameof(cargo), "El cargo no puede ser nulo.");
+            
+        }     
     }
 }
+
+

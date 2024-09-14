@@ -21,7 +21,7 @@ namespace PhAppUser.Domain.Entities
         [Required(ErrorMessage = "El nombre es obligatorio.")]
         [StringLength(30, MinimumLength = 3, ErrorMessage = "El nombre debe tener entre 3 y 30 caracteres.")]
         [RegularExpression(@"^[\p{L}\d\s\-]+$", ErrorMessage = "El nombre solo puede contener letras, números y espacios.")]
-        public string Nombre { get; set; }
+        public required string Nombre { get; set; }
 
         /// <summary>
         /// Descripción completa de la categoría en el sistema.
@@ -29,26 +29,28 @@ namespace PhAppUser.Domain.Entities
         [Required(ErrorMessage = "La descripción es obligatoria.")]
         [StringLength(50, MinimumLength = 10, ErrorMessage = "La descripción debe tener entre 10 y 50 caracteres.")]
         [RegularExpression(@"^[\p{L}\d\s\-]+$", ErrorMessage = "La descripción solo puede contener letras, números y espacios.")]
-        public string Descripcion { get; set; }
+        public required string Descripcion { get; set; }
 
         /// <summary>
         /// Lista de permisos asociados con esta categoría.
         /// </summary>
         public ICollection<Permiso> Permisos { get; set; } = new List<Permiso>();
 
-        // Constructores
         /// <summary>
-        /// Constructor por defecto.
+        /// Constructor vacío requerido por EF Core
         /// </summary>
-        public Categoria() { }
+        public Categoria()
+        {
+            
+        }
 
         /// <summary>
         /// Constructor con parámetros.
         /// </summary>
         public Categoria(string nombre, string descripcion)
         {
-            Nombre = nombre;
-            Descripcion = descripcion;
+            Nombre = nombre?? throw new ArgumentNullException(nameof(nombre));
+            Descripcion = descripcion?? throw new ArgumentNullException(nameof(descripcion));
         }
     }
 }

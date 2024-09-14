@@ -24,7 +24,7 @@ namespace PhAppUser.Domain.Entities
         [Required(ErrorMessage = "El nombre es obligatorio.")]
         [StringLength(30, MinimumLength = 3, ErrorMessage = "El nombre debe tener entre 3 y 30 caracteres.")]
         [RegularExpression(@"^[\p{L}\d\s\-]+$", ErrorMessage = "El nombre solo puede contener letras, números y espacios.")]
-        public string Nombre { get; set; }
+        public required string Nombre { get; set; }
 
         /// <summary>
         /// Descripción detallada del cargo.
@@ -32,7 +32,7 @@ namespace PhAppUser.Domain.Entities
         [Required(ErrorMessage = "La descripción es obligatoria.")]
         [StringLength(50, MinimumLength = 10, ErrorMessage = "La descripción debe tener entre 10 y 50 caracteres.")]
         [RegularExpression(@"^[\p{L}\d\s\-]+$", ErrorMessage = "La descripción solo puede contener letras, números y espacios.")]
-        public string Descripcion { get; set; }
+        public required string Descripcion { get; set; }
 
         /// <summary>
         /// Lista de documentos de representación legal asociados a este cargo.
@@ -53,6 +53,19 @@ namespace PhAppUser.Domain.Entities
             Nombre = nombre;
             Descripcion = descripcion;
         }
+        /// <summary>
+        /// Indica si el usuario está activo como representante legal.
+        /// </summary>
+        public bool EsRepresentanteLegal { get; set; }
+
+        /// <summary>
+        /// Constructor vacío requerido por EF Core
+        /// </summary>
+        public Cargo()
+        {
+            
+        }
+
     }
 }
 

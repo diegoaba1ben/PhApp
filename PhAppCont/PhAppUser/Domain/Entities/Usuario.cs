@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-
 namespace PhAppUser.Domain.Entities
 {
     /// <summary>
@@ -23,7 +22,7 @@ namespace PhAppUser.Domain.Entities
         [Required]
         [StringLength(30, MinimumLength = 3)]
         [RegularExpression(@"^[\p{L}\p{M}'-]+$", ErrorMessage = "Nombre1 solo puede contener letras y caracteres válidos.")]
-        public required string Nombre1 { get; set; } = " ";
+        public required string Nombre1 { get; set; } = string.Empty;
 
         /// <summary>
         /// Obtiene o establece el segundo nombre del usuario.
@@ -31,7 +30,7 @@ namespace PhAppUser.Domain.Entities
         /// </summary>
         [StringLength(30, MinimumLength = 3)]
         [RegularExpression(@"^[\p{L}\p{M}'-]+$", ErrorMessage = "Nombre2 solo puede contener letras y caracteres válidos.")]
-        public string? Nombre2 { get; set; } = string.Empty; //Para que empiece con un valor predeterminado
+        public string? Nombre2 { get; set; } = string.Empty;
 
         /// <summary>
         /// Obtiene o establece el primer apellido del usuario.
@@ -40,7 +39,7 @@ namespace PhAppUser.Domain.Entities
         [Required]
         [StringLength(80, MinimumLength = 3)]
         [RegularExpression(@"^[\p{L}\p{M}'-]+$", ErrorMessage = "Apellido1 solo puede contener letras y caracteres válidos.")]
-        public string Apellido1 { get; set; } = " ";
+        public string Apellido1 { get; set; } = string.Empty;
 
         /// <summary>
         /// Obtiene o establece el segundo apellido del usuario.
@@ -48,7 +47,7 @@ namespace PhAppUser.Domain.Entities
         /// </summary>
         [StringLength(80, MinimumLength = 3)]
         [RegularExpression(@"^[\p{L}\p{M}'-]+$", ErrorMessage = "Apellido2 solo puede contener letras y caracteres válidos.")]
-        public string Apellido2 { get; set; } = " ";
+        public string Apellido2 { get; set; } = string.Empty;
 
         /// <summary>
         /// Obtiene o establece la identificación del usuario.
@@ -57,7 +56,7 @@ namespace PhAppUser.Domain.Entities
         [Required]
         [StringLength(15, MinimumLength = 4)]
         [RegularExpression(@"^\d+$", ErrorMessage = "Identificación solo puede contener números.")]
-        public string Identificacion { get; set; } = " ";
+        public string Identificacion { get; set; } = string.Empty;
 
         /// <summary>
         /// Obtiene o establece la identificación tributaria del usuario.
@@ -66,14 +65,14 @@ namespace PhAppUser.Domain.Entities
         [Required]
         [StringLength(20, MinimumLength = 4)]
         [RegularExpression(@"^\d+$", ErrorMessage = "Identificación Tributaria solo puede contener números.")]
-        public string IdenTributaria { get; set; } = " ";
+        public string IdenTributaria { get; set; } = string.Empty;
 
         /// <summary>
         /// Registra a qué entidad de salud pertenece
         /// </summary>
         [Required]
         [RegularExpression(@"^[\p{L}\p{M}'-]+$", ErrorMessage = "Entidad de Salud solo puede contener letras y caracteres válidos.")]
-        public string EntSalud { get; set; } = " ";
+        public string EntSalud { get; set; } = string.Empty;
 
         /// <summary>
         /// Obtiene o establece la tarjeta profesional del usuario (en caso de ser aplicable).
@@ -93,7 +92,7 @@ namespace PhAppUser.Domain.Entities
         [StringLength(50, MinimumLength = 8)]
         [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,50}$",
         ErrorMessage = "Correo debe tener al menos una letra mayúscula, una letra minúscula, un número y un caracter especial.")]
-        public string Correo { get; set; } = " ";
+        public string Correo { get; set; } = string.Empty;
 
         /// <summary>
         /// Obtiene o establece el número de teléfono del usuario.
@@ -103,7 +102,7 @@ namespace PhAppUser.Domain.Entities
         [Phone]
         [StringLength(15)]
         [RegularExpression(@"^\d+$", ErrorMessage = "Teléfono solo puede contener números.")]
-        public string Telefono { get; set; } = " ";
+        public string Telefono { get; set; } = string.Empty;
 
         /// <summary>
         /// Obtiene o establece la dirección del usuario.
@@ -111,9 +110,8 @@ namespace PhAppUser.Domain.Entities
         /// </summary>
         [Required]
         [StringLength(100)]
-        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{5,100}$",
-            ErrorMessage = "Dirección debe tener una combinación de letras, números y caracteres especiales.")]
-        public string Direccion { get; set; } = " ";
+        [RegularExpression(@"^[a-zA-Z0-9\s]*$", ErrorMessage = "La dirección debe contener letras, números.")]
+        public string Direccion { get; set; } = string.Empty;
 
         /// <summary>
         /// Obtiene o establece la ciudad de residencia del usuario.
@@ -122,7 +120,7 @@ namespace PhAppUser.Domain.Entities
         [Required]
         [StringLength(50, MinimumLength = 3)]
         [RegularExpression(@"^[a-zA-Z\s'-]+$", ErrorMessage = "Ciudad solo puede contener letras y espacios.")]
-        public string Ciudad { get; set; } = " ";
+        public string Ciudad { get; set; } = string.Empty;
 
         /// <summary>
         /// Obtiene o establece el departamento de residencia del usuario.
@@ -131,7 +129,7 @@ namespace PhAppUser.Domain.Entities
         [Required]
         [StringLength(50, MinimumLength = 3)]
         [RegularExpression(@"^[a-zA-Z\s'-]+$", ErrorMessage = "Departamento solo puede contener letras y espacios.")]
-        public string Departamento { get; set; } = " ";
+        public string Departamento { get; set; } = string.Empty;
 
         /// <summary>
         /// Relación entre Usuario y Perfiles con cardinalidad muchos a muchos.
@@ -143,24 +141,24 @@ namespace PhAppUser.Domain.Entities
         /// </summary>
         public Usuario()
         {
-
+            // Inicialización adicional si es necesario!!!
         }
 
         /// <summary>
-        /// Método constructor con parámetros.
+        /// Constructor con parámetros.
         /// </summary>
         public Usuario(string nombre1, string? nombre2, string apellido1, string apellido2,
         string identificacion, string idenTributaria, string entSalud, string? tarjProf,
         string correo, string telefono, string direccion, string ciudad, string departamento)
         {
             Nombre1 = nombre1 ?? throw new ArgumentNullException(nameof(nombre1));
-            Nombre2 = nombre2 ?? string.Empty; // Valor predeterminado si es nulo
+            Nombre2 = nombre2 ?? string.Empty;
             Apellido1 = apellido1 ?? throw new ArgumentNullException(nameof(apellido1));
-            Apellido2 = apellido2 ?? string.Empty; // Valor predeterminado si es nulo
+            Apellido2 = apellido2 ?? string.Empty;
             Identificacion = identificacion ?? throw new ArgumentNullException(nameof(identificacion));
             IdenTributaria = idenTributaria ?? throw new ArgumentNullException(nameof(idenTributaria));
             EntSalud = entSalud ?? throw new ArgumentNullException(nameof(entSalud));
-            TarjProf = tarjProf ?? string.Empty; // Puede ser null, por eso no se lanza excepción
+            TarjProf = tarjProf ?? string.Empty;
             Correo = correo ?? throw new ArgumentNullException(nameof(correo));
             Telefono = telefono ?? throw new ArgumentNullException(nameof(telefono));
             Direccion = direccion ?? throw new ArgumentNullException(nameof(direccion));
@@ -169,4 +167,5 @@ namespace PhAppUser.Domain.Entities
         }
     }
 }
+
 

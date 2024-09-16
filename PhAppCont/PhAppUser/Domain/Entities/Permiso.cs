@@ -1,11 +1,11 @@
-using System.Collections.Generic;
+using System;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+using PhAppUser.Domain.Entities;
 
 namespace PhAppUser.Domain.Entities
 {
     /// <summary>
-    /// Representa un permiso dentro del sistema.
+    /// Representa un permiso dentro del sistema que puede estar asociado a una categoría.
     /// </summary>
     public class Permiso
     {
@@ -16,60 +16,52 @@ namespace PhAppUser.Domain.Entities
         public int Id { get; set; }
 
         /// <summary>
-        /// Nombre del permiso, debe ser único y contener letras y números.
+        /// Nombre del permiso que describe su función dentro del sistema.
         /// </summary>
-        [Required(ErrorMessage = "El nombre es obligatorio.")]
-        [StringLength(30, MinimumLength = 3, ErrorMessage = "El nombre debe tener entre 3 y 30 caracteres.")]
-        [RegularExpression(@"^[a-zA-Z0-9\s]+$", ErrorMessage = "El nombre solo puede contener letras y números.")]
-        public required string Nombre { get; set; }
+        [Required(ErrorMessage = "El nombre del permiso es obligatorio.")]
+        [StringLength(50, MinimumLength = 3, ErrorMessage = "El nombre debe tener entre 3 y 50 caracteres.")]
+        public string Nombre { get; set; } = string.Empty;
 
         /// <summary>
-        /// Descripción completa del permiso.
+        /// Descripción completa del permiso, explicando su funcionalidad.
         /// </summary>
-        [Required(ErrorMessage = "La descripción es obligatoria.")]
-        [StringLength(50, MinimumLength = 10, ErrorMessage = "La descripción debe tener entre 10 y 50 caracteres.")]
-        [RegularExpression(@"^[a-zA-Z0-9\s]+$", ErrorMessage = "La descripción solo puede contener letras y números.")]
-        public required string Descripcion { get; set; }
+        [Required(ErrorMessage = "La descripción no puede exceder los 100 caracteres.")]
+        [StringLength(100)]
+        public string Descripcion { get; set; } = string.Empty;
 
         /// <summary>
-        /// Identificador de la categoría a la que pertenece el permiso.
+        /// Fecha de creación del permiso.
         /// </summary>
         [Required]
-        public required int CategoriaId { get; set; }
+        public DateTime FechaCreacion { get; set; } = DateTime.UtcNow;
 
         /// <summary>
-        /// Muestra el estado de activo o inactivo del permiso.
+        /// Identificación del usuario que creó el permiso
         /// </summary>
-        public bool EstadoActivo { get; set; }
+        public int CreadorId { get; set; }
 
         /// <summary>
-        /// Propiedad navegacional entre permisos y la clase perfil con relación muchos a muchos.
+        /// Categoría a la cual pertenece este permiso.
         /// </summary>
-        public ICollection<PerfilUsuario> Perfiles { get; set; } = new HashSet<PerfilUsuario>();
+        public Categoria Categoria { get; set; } = new Categoria();
 
         /// <summary>
-        /// Categoría a la que pertenece el permiso.
-        /// </summary>
-        [ForeignKey("CategoriaId")]
-        [Required]
-        public required Categoria Categoria { get; set; }
-
-        /// <summary>
-        /// Constructor vacío requerido por EF Core
+        /// Constructor vacío requerido por EF Core.
         /// </summary>
         public Permiso()
         {
-            
         }
 
         /// <summary>
-        /// Constructor con parámetros.
+        /// Constructor que permite crear un permiso con nombre y descripción.
         /// </summary>
-        public Permiso(string nombre, string descripcion, Categoria categoria)
+        public Permiso(string nombre, string descripcion,Categoria categoria)
         {
-            Nombre = nombre;
-            Descripcion = descripcion;
-            Categoria = categoria;
+            Nombre = nombre ?? throw new ArgumentNullException(nameof(nombre));
+            Descripcion = descripcion ?? throw new ArgumentNullException(nameof(descripcion));
+            Categoria = Categoria ?? throw new ArgumentNullException(nameof(Categoria));
         }
     }
 }
+
+

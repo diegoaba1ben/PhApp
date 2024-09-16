@@ -35,6 +35,11 @@ namespace PhAppUser.Domain.Entities
         public required string Descripcion { get; set; }
 
         /// <summary>
+        /// Indica si el usuario está activo como representante legal.
+        /// </summary>
+        public bool EsRepresentanteLegal { get; set; }
+
+        /// <summary>
         /// Lista de documentos de representación legal asociados a este cargo.
         /// </summary>
         public ICollection<RepLegal> RepresentantesLegales { get; set; } = new List<RepLegal>();
@@ -53,11 +58,7 @@ namespace PhAppUser.Domain.Entities
             Nombre = nombre;
             Descripcion = descripcion;
         }
-        /// <summary>
-        /// Indica si el usuario está activo como representante legal.
-        /// </summary>
-        public bool EsRepresentanteLegal { get; set; }
-
+        
         /// <summary>
         /// Constructor vacío requerido por EF Core
         /// </summary>

@@ -68,11 +68,24 @@ namespace PhAppUser.Domain.Entities
         public string IdenTributaria { get; set; } = string.Empty;
 
         /// <summary>
-        /// Registra a qué entidad de salud pertenece
+        /// Identificador de la entidad de salud asociada al usuario.
         /// </summary>
-        [Required]
-        [RegularExpression(@"^[\p{L}\p{M}'-]+$", ErrorMessage = "Entidad de Salud solo puede contener letras y caracteres válidos.")]
-        public string EntSalud { get; set; } = string.Empty;
+        public int EntSaludId { get; set; }
+
+        /// <summary>
+        /// Entidad de salud asociada al usuario.
+        /// </summary>
+        public EntSalud EntSalud { get; set; } = new EntSalud();
+
+        /// <summary>
+        /// Identificador de la entidad de pensión asociada al usuario.
+        /// </summary>
+        public int PensionId { get; set; }
+
+        /// <summary>
+        /// Entidad de pensión asociada al usuario.
+        /// </summary>
+        public Pension Pension { get; set; } = new Pension();   
 
         /// <summary>
         /// Obtiene o establece la tarjeta profesional del usuario (en caso de ser aplicable).
@@ -148,7 +161,7 @@ namespace PhAppUser.Domain.Entities
         /// Constructor con parámetros.
         /// </summary>
         public Usuario(string nombre1, string? nombre2, string apellido1, string apellido2,
-        string identificacion, string idenTributaria, string entSalud, string? tarjProf,
+        string identificacion, string idenTributaria, EntSalud entSalud, Pension pension, string? tarjProf,
         string correo, string telefono, string direccion, string ciudad, string departamento)
         {
             Nombre1 = nombre1 ?? throw new ArgumentNullException(nameof(nombre1));
@@ -158,6 +171,7 @@ namespace PhAppUser.Domain.Entities
             Identificacion = identificacion ?? throw new ArgumentNullException(nameof(identificacion));
             IdenTributaria = idenTributaria ?? throw new ArgumentNullException(nameof(idenTributaria));
             EntSalud = entSalud ?? throw new ArgumentNullException(nameof(entSalud));
+            Pension = pension ?? throw new ArgumentNullException(nameof(pension));
             TarjProf = tarjProf ?? string.Empty;
             Correo = correo ?? throw new ArgumentNullException(nameof(correo));
             Telefono = telefono ?? throw new ArgumentNullException(nameof(telefono));

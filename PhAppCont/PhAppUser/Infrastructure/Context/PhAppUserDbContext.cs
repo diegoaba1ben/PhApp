@@ -15,6 +15,8 @@ namespace PhAppUser.Infrastructure.Context
         public DbSet<Permiso> Permisos { get; set; }
         public DbSet<Categoria> Categorias { get; set; }
         public DbSet<PerfilUsuario> PerfilUsuarios { get; set; }
+        public DbSet<EntSalud> EntsSalud { get; set; }
+        public DbSet<Pension> Pensiones { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -38,6 +40,23 @@ namespace PhAppUser.Infrastructure.Context
             modelBuilder.Entity<Permiso>().ToTable("Permisos");
             modelBuilder.Entity<Categoria>().ToTable("Categorias");
             modelBuilder.Entity<PerfilUsuario>().ToTable("PerfilUsuarios");
+            modelBuilder.Entity<EntSalud>().ToTable("EntsSalud");
+            modelBuilder.Entity<Pension>().ToTable("Pensiones");
+
+            //Configuración para la relación uno a uno  entre Usuario y EntSalud
+            modelBuilder.Entity<Usuario>()
+                .HasOne(u => u.EntSalud)
+                .WithOne()
+                .HasForeignKey<Usuario>(u => u.EntSaludId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            //Configuración de la relación uno a uno entre Usuario Y Pensión
+            modelBuilder.Entity<Usuario>()
+            .HasOne(u => u.Pension)
+            .WithOne()
+            .HasForeignKey<Usuario>(u => u.PensionId)
+            .OnDelete(DeleteBehavior.Restrict);
+
 
             // Agregar más configuraciones según sea necesario
         }

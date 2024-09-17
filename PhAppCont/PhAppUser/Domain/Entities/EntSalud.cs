@@ -64,7 +64,7 @@ namespace PhAppUser.Domain.Entities
         ///  <summary>
         ///  Clase navegaciocional con usuario
         /// </summary>
-        public Usuario usuario { get; set; }
+        public Usuario? usuario { get; set; }
 
         ///  <summary>
         ///  Constructor vacío requerido por EF Core
@@ -86,9 +86,5 @@ namespace PhAppUser.Domain.Entities
             Correo = correo ?? throw new ArgumentNullException(nameof(correo));
             NroAfiliacion = NroAfiliacion ?? throw new ArgumentNullException(nameof(NroAfiliacion));
         }
-
-
-
-
     }
 }

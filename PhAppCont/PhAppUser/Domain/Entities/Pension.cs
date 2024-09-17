@@ -59,12 +59,13 @@ namespace PhAppUser.Domain.Entities
         /// <summary>
         /// Clase navegacional con Usuario 1 a 1
         /// </summary>
+        
         public int UsuarioId{ get; set; }
 
         ///  <summary>
         ///  Clase navegacional con usuario
         /// </summary>
-        public Usuario Usuario { get; set; }
+        public Usuario? Usuario { get; set; }
 
 
         ///  <summary>

@@ -7,21 +7,21 @@ services:
       context: .
       dockerfile: PhAppGateway/Dockerfile
     ports:
-      - "5000:80" # Mapea el puerto 80 del contenedor al puerto 5000 en tu máquina local
-      - "5001:443" # Mapea el puerto 443 del contenedor al puerto 5001 en tu máquina local
+      - "5000:80"
+      - "5001:443"
     environment:
-      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE=ASPNETCORE_ENVIRONMENT}
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
       - ConnectionStrings__DefaultConnection=${DB_CONNECTION_STRING}
     depends_on:
       - phappsecurity
       - phappuser
+      - db
 
   phappsecurity:
     image: phappsecurity:latest
     build:
       context: .
       dockerfile: PhAppSecurity/Dockerfile
-
     environment:
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
       - ConnectionStrings__DefaultConnection=${DB_CONNECTION_STRING}
@@ -36,14 +36,17 @@ services:
       - ConnectionStrings__DefaultConnection=${DB_CONNECTION_STRING}
 
   db:
-    image: mcr.microsoft.com/mssql/server:2022-latest
+    image: mysql:8.0
     environment:
-      SA_PASSWORD: ${SA_PASSWORD}
-      ACCEPT_EULA: "Y"
+      MYSQL_ROOT_PASSWORD: ""
+      MYSQL_DATABASE: PhorizontalDb
+      MYSQL_USER: root
+      MYSQL_PASSWORD: ""
     ports:
-      - "1433:1433"
+      - "3306:3306"
     volumes:
-      - dbdata:/var/opt/mssql
+      - dbdata:/var/lib/mysql
 
 volumes:
   dbdata:
+

@@ -57,11 +57,6 @@ namespace PhAppUser.Domain.Entities
         public string  NroAfiliacion { get; set; } = string.Empty;
 
         ///  <summary>
-        ///  Propiedadad navegacional 1 a 1 con Usuario
-        /// </summary>
-        public int UsuarioId { get; set; }
-
-        ///  <summary>
         ///  Clase navegaciocional con usuario
         /// </summary>
         public Usuario? usuario { get; set; }

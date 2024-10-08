@@ -1,61 +1,135 @@
+using PhAppUser.Domain.Entities;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 
-namespace PhAppUser.Domain.Entities
+namespace PhAppUser.Domain.Builders
 {
     /// <summary>
-    /// Representa el perfil del usuario, incluyendo su cargo y categorías de permisos.
+    /// Builder para construir instancias de PerfilUsuario usando un patrón fluido.
     /// </summary>
-    public class PerfilUsuario
+    public class PerfilUsuarioBuilder : IPerfilUsuarioBuilder
     {
+        private int _perfilUsuarioId;
+        private int _usuarioId;
+        private Usuario _usuario;
+        private int _cargoId;
+        private Cargo _cargo;
+        private ICollection<Categoria> _categorias;
+
         /// <summary>
-        /// Identificador único del usuario asociado al perfil, clave compuesta.
+        /// Constructor inicializa las propiedades por defecto.
         /// </summary>
-        [Required]
-        public int UsuarioId { get; set; }
-        
-        /// <summary>
-        /// Usuario asociado al perfil.
-        /// </summary>
-        [Required]
-        public required Usuario Usuario { get; set; } 
-        
-        /// <summary>
-        /// Identificador del cargo asociado al perfil.
-        /// </summary>
-        [Required]
-        public int CargoId { get; set; }
-        
-        /// <summary>
-        /// Cargo asociado al perfil.
-        /// </summary>
-        [Required]
-        public required Cargo Cargo { get; set; }
-        
-        /// <summary>
-        /// Colección de categorías asociadas al perfil.
-        /// </summary>
-        public ICollection<Categoria> Categorias { get; set; }
-        
-        /// <summary>
-        /// Constructor vacío requerido por EF Core.
-        /// </summary>
-        public PerfilUsuario()
+        public PerfilUsuarioBuilder()
         {
-            Categorias = new List<Categoria>();
+            _categorias = new HashSet<Categoria>();  // Inicialización de la colección de categorías.
         }
-        
+
         /// <summary>
-        /// Constructor con parámetros.
+        /// Asigna el identificador del perfil del usuario.
         /// </summary>
-        public PerfilUsuario(int usuarioId, Usuario usuario, int cargoId, Cargo cargo, ICollection<Categoria> categorias)
+        /// <param name="perfilUsuarioId">Id del perfil del usuario.</param>
+        /// <returns>El mismo builder para encadenamiento.</returns>
+        public PerfilUsuarioBuilder WithPerfilUsuarioId(int perfilUsuarioId)
         {
-            UsuarioId = usuarioId;
-            Usuario = usuario ?? throw new ArgumentNullException(nameof(usuario), "El usuario no puede ser nulo.");
-            CargoId = cargoId;
-            Cargo = cargo ?? throw new ArgumentNullException(nameof(cargo), "El cargo no puede ser nulo.");
-            Categorias = categorias ?? new List<Categoria>();
+            _perfilUsuarioId = perfilUsuarioId;
+            return this;
+        }
+
+        /// <summary>
+        /// Asigna el identificador del usuario.
+        /// </summary>
+        /// <param name="usuarioId">Id del usuario asociado.</param>
+        /// <returns>El mismo builder para encadenamiento.</returns>
+        public PerfilUsuarioBuilder WithUsuarioId(int usuarioId)
+        {
+            _usuarioId = usuarioId;
+            return this;
+        }
+
+        /// <summary>
+        /// Asigna el usuario asociado al perfil.
+        /// </summary>
+        /// <param name="usuario">Objeto Usuario asociado.</param>
+        /// <returns>El mismo builder para encadenamiento.</returns>
+        public PerfilUsuarioBuilder WithUsuario(Usuario usuario)
+        {
+            _usuario = usuario ?? throw new ArgumentNullException(nameof(usuario), "El usuario no puede ser nulo.");
+            return this;
+        }
+
+        /// <summary>
+        /// Asigna el identificador del cargo asociado al perfil.
+        /// </summary>
+        /// <param name="cargoId">Id del cargo asociado.</param>
+        /// <returns>El mismo builder para encadenamiento.</returns>
+        public PerfilUsuarioBuilder WithCargoId(int cargoId)
+        {
+            _cargoId = cargoId;
+            return this;
+        }
+
+        /// <summary>
+        /// Asigna el cargo asociado al perfil.
+        /// </summary>
+        /// <param name="cargo">Objeto Cargo asociado.</param>
+        /// <returns>El mismo builder para encadenamiento.</returns>
+        public PerfilUsuarioBuilder WithCargo(Cargo cargo)
+        {
+            _cargo = cargo ?? throw new ArgumentNullException(nameof(cargo), "El cargo no puede ser nulo.");
+            return this;
+        }
+
+        /// <summary>
+        /// Asigna una colección de categorías al perfil.
+        /// </summary>
+        /// <param name="categorias">Colección de categorías.</param>
+        /// <returns>El mismo builder para encadenamiento.</returns>
+        public PerfilUsuarioBuilder WithCategorias(ICollection<Categoria> categorias)
+        {
+            _categorias = categorias ?? throw new ArgumentNullException(nameof(categorias), "Las categorías no pueden ser nulas.");
+            return this;
+        }
+
+        /// <summary>
+        /// Agrega una categoría individual a la colección de categorías del perfil.
+        /// </summary>
+        /// <param name="categoria">Objeto Categoria a agregar.</param>
+        /// <returns>El mismo builder para encadenamiento.</returns>
+        public PerfilUsuarioBuilder AddCategoria(Categoria categoria)
+        {
+            _categorias.Add(categoria);
+            return this;
+        }
+
+        /// <summary>
+        /// Crea una instancia de PerfilUsuario con las propiedades configuradas.
+        /// </summary>
+        /// <returns>Una instancia de PerfilUsuario.</returns>
+        public PerfilUsuario Build()
+        {
+            return new PerfilUsuario
+            {
+                PerfilUsuarioId = _perfilUsuarioId,
+                UsuarioId = _usuarioId,
+                Usuario = _usuario,
+                CargoId = _cargoId,
+                Cargo = _cargo,
+                Categorias = _categorias
+            };
         }
     }
-}
 
+    /// <summary>
+    /// Interfaz para el Builder de PerfilUsuario.
+    /// </summary>
+    public interface IPerfilUsuarioBuilder
+    {
+        PerfilUsuarioBuilder WithPerfilUsuarioId(int perfilUsuarioId);
+        PerfilUsuarioBuilder WithUsuarioId(int usuarioId);
+        PerfilUsuarioBuilder WithUsuario(Usuario usuario);
+        PerfilUsuarioBuilder WithCargoId(int cargoId);
+        PerfilUsuarioBuilder WithCargo(Cargo cargo);
+        PerfilUsuarioBuilder WithCategorias(ICollection<Categoria> categorias);
+        PerfilUsuarioBuilder AddCategoria(Categoria categoria);
+        PerfilUsuario Build();
+    }
+}

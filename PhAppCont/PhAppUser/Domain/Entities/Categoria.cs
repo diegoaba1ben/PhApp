@@ -1,62 +1,96 @@
+using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 
 namespace PhAppUser.Domain.Entities
 {
     /// <summary>
-    /// Clase que agrupa los permisos de forma lógica para facilitar la gestión, la jerarquía y la seguridad.
+    /// Clase que representa una categoría o rol dentro de la organización.
     /// </summary>
     public class Categoria
     {
         /// <summary>
-        /// Identificador único de la categoría.
+        /// Representa  el identificador único de la categoría.
         /// </summary>
         [Key]
         public int Id { get; set; }
-        
-        /// <summary>
-        /// Nombre de la categoría dentro del sistema.
-        /// </summary>
-        [Required(ErrorMessage = "El nombre es obligatorio.")]
-        [StringLength(30, MinimumLength = 3, ErrorMessage = "El nombre debe tener entre 3 y 30 caracteres.")]
-        [RegularExpression(@"^[\p{L}\d\s\-]+$", ErrorMessage = "El nombre solo puede contener letras, números y espacios.")]
-        public string Nombre { get; set; } = string.Empty;
-        
-        /// <summary>
-        /// Descripción completa de la categoría en el sistema.
-        /// </summary>
-        [Required(ErrorMessage = "La descripción es obligatoria.")]
-        [StringLength(50, MinimumLength = 10, ErrorMessage = "La descripción debe tener entre 10 y 50 caracteres.")]
-        [RegularExpression(@"^[\p{L}\d\s\-]+$", ErrorMessage = "La descripción solo puede contener letras, números y espacios.")]
-        public string Descripcion { get; set; } = string.Empty;
-        
-        /// <summary>
-        /// Lista de permisos asociados con esta categoría.
-        /// </summary>
-        public ICollection<Permiso> Permisos { get; set; } = new List<Permiso>();
 
         /// <summary>
-        /// Constructor vacío requerido por EF Core.
+        /// Representa el nombre de la categoría dentor del sistema
+        /// </summary>
+        [Required(ErrorMessage = "El campo nombre  es obligatorio.")]
+        [RegularExpression(@"^[\p{L}\s'-]+$", ErrorMessage = "El campo Nombre solo acepta letras.")]
+        [StringLenght(20, MinimumLenght = 5, ErrorMessage = "El campo debe contener entre 5  y 20 caracteres.")]
+        public string Nombre { get; set; }      
+
+        /// <summary>
+        /// Represetna la descripción de  la categoría jerárquica.
+        /// </summary>
+        [Required(ErrorMessage = "El campo de descrpción es obligatorio.")]
+        [RegularExpression(@"^[\p{L}\s'-]+$", ErrorMessage = "El campo Nombre solo acepta letras.")]
+        [StringLength(50, ErrorMessage = "El campo debe contener 50 caracteres.")]
+        public string Descripcion { get; set; } 
+
+        ///  <summary>
+        ///  Identificador de la categoría padre
+        /// </summary>
+        public int?CategoriaPadreId { get; set; }
+
+        /// <summary>
+        /// Categoria  padre aplicable, por ejemplo, financiera, administración, etc.
+        /// Se permite nulo para que se puedan generar categorías raíz.
+        /// </summary>
+        public Categoria CategoriaPadre { get; set; }
+
+        /// <summary>
+        /// Categoría  hijo aplicable, por ejemplo, contabilidad, tesorería, etc.
+        /// </summary>
+        public List<Categoria> SubCategorias { get; set; }
+
+        /// <summary>
+        /// Constructor por defecto
         /// </summary>
         public Categoria()
         {
-            // Se inicializa la colección para evitar nulos.
-            Permisos = new List<Permiso>();
+            SubCategorias = new List<Categoria>();
         }
 
         /// <summary>
-        /// Constructor con parámetros.
+        /// Método para agregar una subcategoría a la categoría actual.
         /// </summary>
-        /// <param name="nombre">Nombre de la categoría.</param>
-        /// <param name="descripcion">Descripción de la categoría.</param>
-        public Categoria(string nombre, string descripcion)
+        public void AgregarSubCategoria(Categoria subCategoria)
         {
-            Nombre = nombre ?? throw new ArgumentNullException(nameof(nombre), "El nombre no puede ser nulo.");
-            Descripcion = descripcion ?? throw new ArgumentNullException(nameof(descripcion), "La descripción no puede ser nula.");
-            Permisos = new List<Permiso>(); 
+            if(subCategoria == null)
+            {
+                throw new ArgumentNullException(nameof(subCategoria), "La subcategoría no puede ser nula.")
+
+                subCategoria.CategoriaPadre = this; //Establece la categoría
+                SubCategorias.Add(subCategoria); //Agrega la subcategoría a la lista
+            }
         }
 
-        
+        /// <summary>
+        /// Método para imprimir la jerarquía de la categoría y sus subcategorías.
+        /// </summary>
+        public void ImprimirJerarquia(int nivel = 0)
+        {
+            string indentacion = new string(' ', nivel * 4);
+            Console.WriteLine($"{indentacion}- {Nombre}");
+
+            foreach (var subCategoria in SubCategorias)
+            {
+                subCategoria.ImprimirJerarquia(nivel + 1);
+            }
+        }
+        ///  <summary>
+        ///  Método estático para la inicialización de un builder de la clase categoría
+        /// </summary>
+        /// <returns>Retorna una nueva instancia de CategoriaBuilder</returns>
+        public static CategoriaBuilder Crearbuilder()
+        {
+            return new CategoriaBuilder();
+        }
+
     }
 }
+
 

@@ -1,67 +1,72 @@
 using System;
 using System.ComponentModel.DataAnnotations;
-using PhAppUser.Domain.Entities;
 
 namespace PhAppUser.Domain.Entities
 {
-    /// <summary>
-    /// Representa un permiso dentro del sistema que puede estar asociado a una categoría.
-    /// </summary>
     public class Permiso
     {
-        /// <summary>
-        /// Identificador único del permiso.
-        /// </summary>
         [Key]
-        public int Id { get; set; }
+        public int Id { get; private set; }
 
-        /// <summary>
-        /// Nombre del permiso que describe su función dentro del sistema.
-        /// </summary>
         [Required(ErrorMessage = "El nombre del permiso es obligatorio.")]
-        [StringLength(50, MinimumLength = 3, ErrorMessage = "El nombre debe tener entre 3 y 50 caracteres.")]
-        public string Nombre { get; set; } = string.Empty;
+        [StringLength(50, MinimumLength = 3)]
+        public string Nombre { get; private set; } = string.Empty;
 
-        /// <summary>
-        /// Descripción completa del permiso, explicando su funcionalidad.
-        /// </summary>
-        [Required(ErrorMessage = "La descripción no puede exceder los 100 caracteres.")]
+        [Required(ErrorMessage = "La descripción es obligatoria.")]
         [StringLength(100)]
-        public string Descripcion { get; set; } = string.Empty;
+        public string Descripcion { get; private set; } = string.Empty;
 
-        /// <summary>
-        /// Fecha de creación del permiso.
-        /// </summary>
         [Required]
-        public DateTime FechaCreacion { get; set; } = DateTime.UtcNow;
+        public DateTime FechaCreacion { get; private set; } = DateTime.UtcNow;
 
-        /// <summary>
-        /// Identificación del usuario que creó el permiso
-        /// </summary>
-        public int CreadorId { get; set; }
+        public int CreadorPermisoId { get; private set; }
 
-        /// <summary>
-        /// Categoría a la cual pertenece este permiso.
-        /// </summary>
-        public Categoria Categoria { get; set; } = new Categoria();
+        public int CategoriaId { get; private set; } // Añadido para la relación
+        public Categoria Categoria { get; private set; } = new Categoria();
 
-        /// <summary>
-        /// Constructor vacío requerido por EF Core.
-        /// </summary>
-        public Permiso()
+        // Constructor privado para el builder
+        private Permiso() { }
+
+        // Método builder
+        public static PermisoBuilder Builder() => new PermisoBuilder();
+
+        public class PermisoBuilder
         {
-        }
+            private readonly Permiso _permiso = new Permiso();
 
-        /// <summary>
-        /// Constructor que permite crear un permiso con nombre y descripción.
-        /// </summary>
-        public Permiso(string nombre, string descripcion,Categoria categoria)
-        {
-            Nombre = nombre ?? throw new ArgumentNullException(nameof(nombre));
-            Descripcion = descripcion ?? throw new ArgumentNullException(nameof(descripcion));
-            Categoria = Categoria ?? throw new ArgumentNullException(nameof(Categoria));
+            public PermisoBuilder WithNombre(string nombre)
+            {
+                _permiso.Nombre = nombre;
+                return this;
+            }
+
+            public PermisoBuilder WithDescripcion(string descripcion)
+            {
+                _permiso.Descripcion = descripcion;
+                return this;
+            }
+
+            public PermisoBuilder WithCreadorPermisoId(int creadorPermisoId)
+            {
+                _permiso.CreadorPermisoId = creadorPermisoId;
+                return this;
+            }
+
+            public PermisoBuilder WithCategoria(Categoria categoria)
+            {
+                _permiso.Categoria = categoria;
+                _permiso.CategoriaId = categoria.Id; // Asignar el ID de la categoría
+                return this;
+            }
+
+            public Permiso Build()
+            {
+                // Validaciones adicionales pueden ser agregadas aquí
+                return _permiso;
+            }
         }
     }
 }
+
 
 

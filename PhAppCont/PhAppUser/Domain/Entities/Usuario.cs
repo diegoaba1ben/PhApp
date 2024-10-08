@@ -1,184 +1,157 @@
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace PhAppUser.Domain.Entities
 {
     /// <summary>
-    /// Representa un usuario dentro del sistema.
+    /// Clase que representa a un usuario dentro del sistema.
     /// </summary>
     public class Usuario
     {
-        /// <summary>
-        /// Obtiene o establece el identificador único del usuario.
-        /// </summary>
+        #region Propiedades Básicas de Identificación
+
         [Key]
-        public int Id { get; set; }
+        [Required(ErrorMessage = "El ID del usuario es obligatorio.")]
+        public int Id { get; private set; }
+
+        [Required(ErrorMessage = "El primer nombre es obligatorio.")]
+        [StringLength(30, ErrorMessage = "El nombre no puede tener más de 30 caracteres.")]
+        [RegularExpression(@"^[\p{L}]+$", ErrorMessage = "El nombre solo acepta letras.")]
+        public string PrimerNombre { get; private set; }
+
+        [StringLength(30, ErrorMessage = "El segundo nombre no puede tener más de 30 caracteres.")]
+        [RegularExpression(@"^[\p{L}]+$", ErrorMessage = "El segundo nombre solo acepta letras.")]
+        public string? SegundoNombre { get; private set; }
+
+        [Required(ErrorMessage = "El primer apellido es obligatorio.")]
+        [StringLength(40, ErrorMessage = "El apellido no puede tener más de 40 caracteres.")]
+        [RegularExpression(@"^[\p{L}]+$", ErrorMessage = "El apellido solo acepta letras.")]
+        public string PrimerApellido { get; private set; }
+
+        [StringLength(40, ErrorMessage = "El segundo apellido no puede tener más de 40 caracteres.")]
+        [RegularExpression(@"^[\p{L}]+$", ErrorMessage = "El segundo apellido solo acepta letras.")]
+        public string? SegundoApellido { get; private set; }
+
+        public TipoIdentificacion TipoIdentificacion { get; private set; }
+
+        [Required(ErrorMessage = "El número de identificación personal es obligatorio.")]
+        [StringLength(20, MinimumLength = 5, ErrorMessage = "El número de identificación debe tener entre 5 y 20 caracteres.")]
+        [RegularExpression(@"^\d+$", ErrorMessage = "El campo identificación solo acepta números.")]
+        public string IdentificacionPersonal { get; private set; }
+
+        public TipoIdentTrib TipoIdenTrib { get; private set; }
+
+        [StringLength(20, ErrorMessage = "El nombre de la entidad prestadora no debe esceder los  20 caracteres.")]
+        [RegularExpression(@"^\d+$"), ErrorMessage = "El campo número de identidad tributaria solo acepta números."]
+        public string? IdenTrib { get; private set; }
+
+        public TipoSegSoc TipoSegSoc { get; private set; }
+        public string EntidadPrestadora { get; private set; }
+        public bool EsContador { get; private set; }
+        public string? TarProf { get; private set; }
+
+        #endregion
+
+        #region Propiedades de Ubicación
+
+        [Required(ErrorMessage = "La ciudad es obligatoria.")]
+        [StringLength(50, ErrorMessage = "La ciudad no puede tener más de 50 caracteres.")]
+        [RegularExpression(@"^[\p{L}\s]+$", ErrorMessage = "La ciudad debe contener solo letras.")]
+        public string Ciudad { get; private set; }
+
+        [Required(ErrorMessage = "La dirección es obligatoria.")]
+        [StringLength(100, ErrorMessage = "La dirección no puede tener más de 100 caracteres.")]
+        [RegularExpression(@"^[\p{L}0-9\s]+$", ErrorMessage = "La dirección puede contener números y letras.")]
+        public string Direccion { get; private set; }
+
+        #endregion
+
+        #region Propiedades de Contacto
+
+        [Required(ErrorMessage = "El número telefónico es obligatorio.")]
+        [StringLength(20, ErrorMessage = "El número telefónico no puede tener más de 20 caracteres.")]
+        [RegularExpression(@"^\d+$", ErrorMessage = "El número telefónico solo puede contener números.")]
+        public string Telefono { get; private set; }
+
+        [Required(ErrorMessage = "El correo electrónico es obligatorio.")]
+        [EmailAddress(ErrorMessage = "El formato del correo electrónico no es válido.")]
+        public string Correo { get; private set; }
+
+        #endregion
+
+        #region Seguridad
+
+        [Required(ErrorMessage = "La contraseña es obligatoria.")]
+        [StringLength(15, MinimumLength = 6, ErrorMessage = "La contraseña debe contener entre 6 y 15 caracteres.")]
+        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&])", ErrorMessage = "La contraseña debe contener al menos un número, una letra mayúscula, una letra minúscula y un carácter especial.")]
+        public string Clave { get; private set; }
+
+        #endregion
+
+        // Constructor privado para restringir la creación de instancias.
+        private Usuario() { }
+
+        //Propiedades claculadas
+        public string NombreCompleto => $"{PrimerNombre} {(SegundoNombre ?? string.Empty)} {PrimerApellido} {(SegundoApellido ?? string.Empty)}".Trim();
+        public string DireccionCompleta => $"{Direccion}  {Ciudad}";
+
+
+        #region Inicialización del Builder
 
         /// <summary>
-        /// Obtiene o establece el primer nombre del usuario.
-        /// Solo puede contener letras y caracteres válidos.
+        /// Método estático para inicializar el Builder.
         /// </summary>
-        [Required]
-        [StringLength(30, MinimumLength = 3)]
-        [RegularExpression(@"^[\p{L}\p{M}'-]+$", ErrorMessage = "Nombre1 solo puede contener letras y caracteres válidos.")]
-        public required string Nombre1 { get; set; } = string.Empty;
+        public static UsuarioBuilder CrearBuilder() => new UsuarioBuilder();
 
         /// <summary>
-        /// Obtiene o establece el segundo nombre del usuario.
-        /// Puede ser opcional y solo puede contener letras y caracteres válidos.
+        /// Clase interna de UsuarioBuilder para facilitar la construcción del objeto Usuario.
         /// </summary>
-        [StringLength(30, MinimumLength = 3)]
-        [RegularExpression(@"^[\p{L}\p{M}'-]+$", ErrorMessage = "Nombre2 solo puede contener letras y caracteres válidos.")]
-        public string? Nombre2 { get; set; } = string.Empty;
-
-        /// <summary>
-        /// Obtiene o establece el primer apellido del usuario.
-        /// Solo puede contener letras y caracteres válidos.
-        /// </summary>
-        [Required]
-        [StringLength(80, MinimumLength = 3)]
-        [RegularExpression(@"^[\p{L}\p{M}'-]+$", ErrorMessage = "Apellido1 solo puede contener letras y caracteres válidos.")]
-        public string Apellido1 { get; set; } = string.Empty;
-
-        /// <summary>
-        /// Obtiene o establece el segundo apellido del usuario.
-        /// Solo puede contener letras y caracteres válidos.
-        /// </summary>
-        [StringLength(80, MinimumLength = 3)]
-        [RegularExpression(@"^[\p{L}\p{M}'-]+$", ErrorMessage = "Apellido2 solo puede contener letras y caracteres válidos.")]
-        public string Apellido2 { get; set; } = string.Empty;
-
-        /// <summary>
-        /// Obtiene o establece la identificación del usuario.
-        /// Solo puede contener números.
-        /// </summary>
-        [Required]
-        [StringLength(15, MinimumLength = 4)]
-        [RegularExpression(@"^\d+$", ErrorMessage = "Identificación solo puede contener números.")]
-        public string Identificacion { get; set; } = string.Empty;
-
-        /// <summary>
-        /// Obtiene o establece la identificación tributaria del usuario.
-        /// Solo puede contener números.
-        /// </summary>
-        [Required]
-        [StringLength(20, MinimumLength = 4)]
-        [RegularExpression(@"^\d+$", ErrorMessage = "Identificación Tributaria solo puede contener números.")]
-        public string IdenTributaria { get; set; } = string.Empty;
-
-        /// <summary>
-        /// Identificador de la entidad de salud asociada al usuario.
-        /// </summary>
-        public int EntSaludId { get; set; }
-
-        /// <summary>
-        /// Entidad de salud asociada al usuario.
-        /// </summary>
-        public EntSalud EntSalud { get; set; } = new EntSalud();
-
-        /// <summary>
-        /// Identificador de la entidad de pensión asociada al usuario.
-        /// </summary>
-        public int PensionId { get; set; }
-
-        /// <summary>
-        /// Entidad de pensión asociada al usuario.
-        /// </summary>
-        public Pension Pension { get; set; } = new Pension();   
-
-        /// <summary>
-        /// Obtiene o establece la tarjeta profesional del usuario (en caso de ser aplicable).
-        /// Solo puede contener números.
-        /// </summary>
-        [StringLength(20, MinimumLength = 4)]
-        [RegularExpression(@"^\d+$", ErrorMessage = "Tarjeta profesional solo puede contener números.")]
-        public string? TarjProf { get; set; } = string.Empty;
-
-        /// <summary>
-        /// Obtiene o establece el correo electrónico del usuario.
-        /// Debe contener entre 8 y 15 caracteres, incluyendo al menos una letra mayúscula, 
-        /// una minúscula, un número, y un caracter especial.
-        /// </summary>
-        [Required]
-        [EmailAddress]
-        [StringLength(50, MinimumLength = 8)]
-        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,50}$",
-        ErrorMessage = "Correo debe tener al menos una letra mayúscula, una letra minúscula, un número y un caracter especial.")]
-        public string Correo { get; set; } = string.Empty;
-
-        /// <summary>
-        /// Obtiene o establece el número de teléfono del usuario.
-        /// Solo puede contener números.
-        /// </summary>
-        [Required]
-        [Phone]
-        [StringLength(15)]
-        [RegularExpression(@"^\d+$", ErrorMessage = "Teléfono solo puede contener números.")]
-        public string Telefono { get; set; } = string.Empty;
-
-        /// <summary>
-        /// Obtiene o establece la dirección del usuario.
-        /// Puede contener cualquier combinación de letras, números y caracteres especiales.
-        /// </summary>
-        [Required]
-        [StringLength(100)]
-        [RegularExpression(@"^[a-zA-Z0-9\s]*$", ErrorMessage = "La dirección debe contener letras, números.")]
-        public string Direccion { get; set; } = string.Empty;
-
-        /// <summary>
-        /// Obtiene o establece la ciudad de residencia del usuario.
-        /// Solo puede contener letras y espacios.
-        /// </summary>
-        [Required]
-        [StringLength(50, MinimumLength = 3)]
-        [RegularExpression(@"^[a-zA-Z\s'-]+$", ErrorMessage = "Ciudad solo puede contener letras y espacios.")]
-        public string Ciudad { get; set; } = string.Empty;
-
-        /// <summary>
-        /// Obtiene o establece el departamento de residencia del usuario.
-        /// Solo puede contener letras y espacios.
-        /// </summary>
-        [Required]
-        [StringLength(50, MinimumLength = 3)]
-        [RegularExpression(@"^[a-zA-Z\s'-]+$", ErrorMessage = "Departamento solo puede contener letras y espacios.")]
-        public string Departamento { get; set; } = string.Empty;
-
-        /// <summary>
-        /// Relación entre Usuario y Perfiles con cardinalidad muchos a muchos.
-        /// </summary>
-        public ICollection<PerfilUsuario> PerfileUsuarios { get; set; } = new List<PerfilUsuario>();
-
-        /// <summary>
-        /// Constructor vacío requerido por EF Core
-        /// </summary>
-        public Usuario()
+        public class UsuarioBuilder
         {
-            // Inicialización adicional si es necesario!!!
+            private Usuario _usuario;
+
+            public UsuarioBuilder()
+            {
+                _usuario = new Usuario();
+            }
+
+            // Métodos de construcción encadenados con validaciones.
+            public UsuarioBuilder ConId(int id) => AsignarValor(u => u.Id = id, id > 0, "El ID debe ser un número positivo.");
+            public UsuarioBuilder ConPrimerNombre(string primerNombre) => AsignarValor(u => u.PrimerNombre = primerNombre, !string.IsNullOrWhiteSpace(primerNombre), "El primer nombre no puede estar vacío.");
+            public UsuarioBuilder ConSegundoNombre(string? segundoNombre) => AsignarValor(u => u.SegundoNombre = segundoNombre);
+            public UsuarioBuilder ConPrimerApellido(string primerApellido) => AsignarValor(u => u.PrimerApellido = primerApellido, !string.IsNullOrWhiteSpace(primerApellido), "El primer apellido no puede estar vacío.");
+            public UsuarioBuilder ConSegundoApellido(string? segundoApellido) => AsignarValor(u => u.SegundoApellido = segundoApellido);
+            public UsuarioBuilder ConTipoIdentificacion(TipoIdentificacion tipoIdentificacion) => AsignarValor(u => u.TipoIdentificacion = tipoIdentificacion);
+            public UsuarioBuilder ConIdentificacionPersonal(string identificacionPersonal) => AsignarValor(u => u.IdentificacionPersonal = identificacionPersonal, !string.IsNullOrWhiteSpace(identificacionPersonal), "La identificación es obligatoria.");
+            public UsuarioBuilder ConTipoIdenTrib(bool TipoIdenTrib) => AsignarValor(u => u.IdenTrib = idenTrib);
+            public UsuarioBuilder ConIdenTrib(string? idenTrib) => AsignarValor(u =>  u.IdenTrib = idenTrib);
+            public UsuarioBuilder ConTipoSegSoc(TipoSegSoc tipoSegSoc) =>AsignarValor(u => u.TipoSegSoc = tipoSegSoc);
+            public UsuarioBuilder ConEntidadPrestadora(string  entidadPrestadora) => AsignarValor(u => u.EntidadPrestadora = entidadPrestadora);
+            public UsuarioBuilder ConEsContador(bool esContador) => AsignarValor(u => u.EsContador = esContador);
+            public Usuarioibuilder ConTarProf(string? tarProf) => AsignarValor(u => u.TarProf = tarProf);
+
+            public UsuarioBuilder ConCiudad(string ciudad) => AsignarValor(u => u.Ciudad = ciudad);
+            public UsuarioBuilder ConDireccion(string direccion) => AsignarValor(u => u.Direccion = direccion);
+            public UsuarioBuilder ConTelefono(string telefono) => AsignarValor(u => u.Telefono = telefono, telefono.Length >= 7, "El número telefónico debe ser mayor a 7 dígitos.");
+            public UsuarioBuilder ConCorreo(string correo) => AsignarValor(u => u.Correo = correo, new EmailAddressAttribute().IsValid(correo), "Correo inválido.");
+            public UsuarioBuilder ConClave(string clave) => AsignarValor(u => u.Clave = clave, clave.Length >= 6, "La contraseña debe tener al menos 6 caracteres.");
+                              
+            // Método privado para asignar valores con validación.
+            private UsuarioBuilder AsignarValor(Action<Usuario> setter, bool condicion = true, string mensajeError = "")
+            {
+                if (!condicion && !string.IsNullOrEmpty(mensajeError))
+                    throw new ArgumentException(mensajeError);
+                setter(_usuario);
+                return this;
+            }
+
+            /// <summary>
+            /// Construye el objeto Usuario.
+            /// </summary>
+            public Usuario Build() => _usuario;
         }
 
-        /// <summary>
-        /// Constructor con parámetros.
-        /// </summary>
-        public Usuario(string nombre1, string? nombre2, string apellido1, string apellido2,
-        string identificacion, string idenTributaria, EntSalud entSalud, Pension pension, string? tarjProf,
-        string correo, string telefono, string direccion, string ciudad, string departamento)
-        {
-            Nombre1 = nombre1 ?? throw new ArgumentNullException(nameof(nombre1));
-            Nombre2 = nombre2 ?? string.Empty;
-            Apellido1 = apellido1 ?? throw new ArgumentNullException(nameof(apellido1));
-            Apellido2 = apellido2 ?? string.Empty;
-            Identificacion = identificacion ?? throw new ArgumentNullException(nameof(identificacion));
-            IdenTributaria = idenTributaria ?? throw new ArgumentNullException(nameof(idenTributaria));
-            EntSalud = entSalud ?? throw new ArgumentNullException(nameof(entSalud));
-            Pension = pension ?? throw new ArgumentNullException(nameof(pension));
-            TarjProf = tarjProf ?? string.Empty;
-            Correo = correo ?? throw new ArgumentNullException(nameof(correo));
-            Telefono = telefono ?? throw new ArgumentNullException(nameof(telefono));
-            Direccion = direccion ?? throw new ArgumentNullException(nameof(direccion));
-            Ciudad = ciudad ?? throw new ArgumentNullException(nameof(ciudad));
-            Departamento = departamento ?? throw new ArgumentNullException(nameof(departamento));
-        }
+        #endregion
     }
 }
 

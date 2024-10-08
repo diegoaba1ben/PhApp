@@ -1,8 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using System;
 using PhAppUser.Infrastructure.Context;
-using Pomelo.EntityFrameworkCore.MySql.Infrastructure; //connector
+using Pomelo.EntityFrameworkCore.MySql.Infrastructure; // Conector MySQL
 using DotNetEnv; // Importar DotNetEnv para manejar el archivo .env
+using PhAppUser.Application.Interfaces; // Agrega la interfaz del repositorio
+using PhAppUser.Infrastructure.Repositories; // Agrega la implementación del repositorio
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,27 +14,51 @@ Env.Load();
 // Obtener la cadena de conexión desde las variables de entorno
 var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
 
-// Configuración de DbContext para MySql utilizando la cadena de conexión del .env
-builder.Services.AddDbContext<AppDbContext>(options => 
-    options.UseMySql(connectionString, 
+if (string.IsNullOrEmpty(connectionString))
+{
+    throw new InvalidOperationException("La cadena de conexión no está configurada en el archivo .env.");
+}
+
+// Configuración de DbContext para MySQL utilizando la cadena de conexión del .env
+builder.Services.AddDbContext<PhAppUserDbContext>(options =>
+    options.UseMySql(connectionString,
     new MySqlServerVersion(new Version(8, 0, 2))));
 
 // Configuración de CORS
-builder.Services.AddCors("AllowAll", builder => builder
-    .AllowAnyOrigin() 
-    .AllowAnyMethod()
-    .AllowAnyHeader());
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        builder =>
+        {
+            builder.AllowAnyOrigin() // Permitir cualquier origen
+                   .AllowAnyMethod() // Permitir cualquier método HTTP (GET, POST, etc.)
+                   .AllowAnyHeader(); // Permitir cualquier encabezado
+        });
+});
 
-// Controladores o servicios relacionados PhAppGateway
+// Registro de repositorios
+builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
+builder.Services.AddScoped<IPermisoRepository, PermisoRepository>();
+builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
+builder.Services.AddScoped<ICargoRepository, CargoRepository>();
+builder.Services.AddScoped<IRepLegalRepository, RepLegalRepository>();
+builder.Services.AddScoped<IEntidadPrestadoraRepository, EntidadPrestadoraRepository>();
+builder.Services.AddScoped<IEntSaludRepository, EntSaludRepository>(); // Cambiado a EntSaludRepository
+builder.Services.AddScoped<IPerfilUsuarioRepository, PerfilUsuarioRepository>()
+builder.Services.AddScopped<IValidationService, ValidationService>();
+// Controladores y servicios relacionados
 builder.Services.AddControllers();
-
-// Add services to the container.
-builder.Services.AddRazorPages();
+// builder.Services.AddRazorPages(); // Si no estás utilizando Razor Pages, puedes comentarlo
 
 var app = builder.Build();
 
-// Configuración de HTTP requeridas por el pipeline.
-if (!app.Environment.IsDevelopment())
+// Configuración de HTTP requerida por el pipeline.
+if (app.Environment.IsDevelopment())
+{
+    // Puedes usar Developer Exception Page o una configuración especial en desarrollo
+    app.UseDeveloperExceptionPage();
+}
+else
 {
     app.UseExceptionHandler("/Error");
     app.UseHsts();
@@ -41,16 +67,12 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
-app.UseRouting();
+app.UseCors("AllowAll"); // Activar CORS en la aplicación
 
-//Aplicación de la política de CORS
-app.UseCors("AllowAll");
+app.UseRouting();
 
 app.UseAuthorization();
 
-// Mapeo de endpoints de API
 app.MapControllers();
-app.MapRazorPages();
 
 app.Run();
-

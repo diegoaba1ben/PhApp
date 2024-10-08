@@ -1,90 +1,28 @@
 using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 
 namespace PhAppUser.Domain.Entities
 {
-    public class Pension
+    /// <summary>
+    /// Clase que representa una entidad prestadora de pensiones.
+    /// Hereda de la clase EntidadPrestadora.
+    /// </summary>
+    public class Pension : EntidadPrestadora
     {
         /// <summary>
-        /// Clase encargada de registrar los fondos de pensión
-
+        /// Constructor de la clase Pension.
         /// </summary>
-        [Key]
-        public int Id { get; set; }
-
-        /// <summary
-        /// Nombre de los fondos de pensión
-        /// </summary>
-        [Required]
-        [StringLength(30, MinimumLength =3)]
-        public string Nombre { get; set; } = string.Empty;
-
-        /// <summary>
-        /// Número de Identificación Tributaria (NIT)
-        /// </summary>
-        [Required]
-        [StringLength(20, MinimumLength =2)]
-        public string Nit { get; set;} =string.Empty;
-
-        ///  <summary>
-        ///  Dirección del fondo de pensión
-        /// </summary>
-        [Required]
-        [StringLength(50)]
-        public string Direccion { get; set; } = string.Empty;
-
-        ///  <summary>
-        ///  Teléfono del fondo de pensión
-        /// </summary>
-        [Required]
-        [StringLength(20)]
-        public string Telefono { get; set; } = string.Empty;
-
-        /// <summary>
-        /// Correo electrónico de  contacto
-        /// </summary>
-        [Required]
-        [StringLength(50)]
-        [EmailAddress]
-        public string Correo { get; set; } = string.Empty;
-
-        ///  <summary>
-        ///  Número de afiliación del usuario a esta entidad
-        /// </summary>
-        [Required]
-        [StringLength(30)]
-        public string  NroAfiliacion { get; set; } = string.Empty;
-
-        ///  <summary>
-        ///  Clase navegacional con usuario
-        /// </summary>
-        public Usuario? Usuario { get; set; }
-
-
-        ///  <summary>
-        ///  Constructor vacío requerido por EF Core
-        /// </summary>
-        public Pension()
+        /// <param name="tipo">Tipo de entidad prestadora (en este caso, debe ser Pensión).</param>
+        /// <param name="nombre">Nombre de la entidad prestadora.</param>
+        /// <param name="nit">Número de Identificación Tributaria (NIT).</param>
+        /// <param name="direccion">Dirección de la entidad prestadora.</param>
+        /// <param name="telefono">Teléfono de la entidad prestadora.</param>
+        /// <param name="correo">Correo electrónico de contacto.</param>
+        /// <param name="nroAfiliacion">Número de afiliación del usuario a esta entidad.</param>
+        /// <param name="usuario">Usuario asociado a la entidad prestadora.</param>
+        public Pension(TipoEntPrestadora tipo, string nombre, string nit, string direccion, string telefono, string correo, string nroAfiliacion, Usuario usuario)
+            : base(tipo, nombre, nit, direccion, telefono, correo, nroAfiliacion, usuario)
         {
-
+            // No se requieren atributos adicionales por ahora
         }
-
-        ///  <summary>
-        ///  Constructor con parámetros
-        /// </summary>
-        public Pension(string nombre, string nit, string direccion, string telefono, string correo, string NroAfiliacion)
-        {
-            Nombre = nombre ?? throw new ArgumentNullException(nameof(nombre));
-            Nit = nit ?? throw new ArgumentNullException (nameof(nit));
-            Direccion = direccion ?? throw new ArgumentNullException(nameof(direccion));
-            Telefono = telefono ?? throw new ArgumentNullException(nameof(telefono));
-            Correo = correo ?? throw new ArgumentNullException(nameof(correo));
-            NroAfiliacion = NroAfiliacion ?? throw new ArgumentNullException(nameof(NroAfiliacion));
-        }
-
-
-
-
     }
 }

@@ -21,16 +21,16 @@ namespace PhAppUser.Domain.Entities
         /// </summary>
         [Required]
         [StringLength(50)]  // Longitud máxima de 50 caracteres para asegurar la consistencia
-        public required string AlcaldiaEmisora { get; set; }
+        public string AlcaldiaEmisora { get; private set; }
 
         /// <summary>
         /// Relación con la entidad Cargo que indica el rol asociado a este documento.
         /// </summary>
         [Required]
-        public required int CargoId { get; set; }
+        public int CargoId { get; private set; }
 
         [ForeignKey("CargoId")]
-        public required Cargo Cargo { get; set; }
+        public Cargo Cargo { get; private set; }
 
         /// <summary>
         /// Fecha de expedición del documento de representación legal.
@@ -38,26 +38,48 @@ namespace PhAppUser.Domain.Entities
         [Required]
         [DataType(DataType.Date)]
         [CustomValidation(typeof(RepLegal), nameof(ValidarFechaExpedicion))]
-        public required DateTime FechaExpedicion { get; set; }
+        public DateTime FechaExpedicion { get; private set; }
 
+        /// <summary>
+        /// Fecha de vencimiento del documento.
+        /// </summary>
+        [Required]
+        [DataType(DataType.Date)]
+        public DateTime FechaVencimiento { get; private set; }
+
+        /// <summary>
+        /// Atributo que indica si el Representante Legal está en condición de activo o inactivo.
+        /// </summary>
+        public bool EsActivo { get; set; } = true;
+
+        // Constructor privado para el builder
+        private RepLegal() { }
+
+        /// <summary>
+        /// Constructor privado para inicializar un representante legal a través del builder.
+        /// </summary>
+        /// <param name="builder">El builder que crea la instancia de RepLegal.</param>
+        private RepLegal(RepLegalBuilder builder)
+        {
+            FechaExpedicion = builder.FechaExpedicion;
+            FechaVencimiento = builder.FechaVencimiento;
+            AlcaldiaEmisora = builder.AlcaldiaEmisora;
+            CargoId = builder.CargoId;
+            Cargo = builder.Cargo;
+            EsActivo = builder.EsActivo;
+        }
+
+        /// <summary>
+        /// Valida la fecha de expedición.
+        /// </summary>
         public static ValidationResult ValidarFechaExpedicion(DateTime fechaExpedicion)
         {
-            
-            if(fechaExpedicion > DateTime.Now)
+            if (fechaExpedicion > DateTime.Today)
             {
                 return new ValidationResult("La fecha de expedición no puede ser posterior a la fecha actual");
             }
             return ValidationResult.Success ?? new ValidationResult("Validación exitosa");
         }
-
-        /// <summary>
-        /// Calcula la fecha de vencimiento basada en la fecha de expedición.
-        /// Esta fecha debe ser proporcionada manualmente según lo autorizado.
-        /// </summary>
-       [Required]
-       [DataType(DataType.Date)]
-       public required DateTime FechaVencimiento { get; set; }
-
 
         /// <summary>
         /// Calcula los días restantes hasta el vencimiento del documento.
@@ -67,7 +89,7 @@ namespace PhAppUser.Domain.Entities
             return (FechaVencimiento - DateTime.Now).Days;
         }
 
-         /// <summary>
+        /// <summary>
         /// Verifica si el documento ya está vencido.
         /// </summary>
         public bool EsDocumentoVencido()
@@ -76,26 +98,78 @@ namespace PhAppUser.Domain.Entities
         }
 
         /// <summary>
-        /// Constructor vacío requerido por EF Core
+        /// Builder para crear instancias de RepLegal.
         /// </summary>
-        public RepLegal()
+        public class RepLegalBuilder
         {
-            
-        }
+            public DateTime FechaExpedicion { get; private set; }
+            public DateTime FechaVencimiento { get; private set; }
+            public string AlcaldiaEmisora { get; private set; }
+            public int CargoId { get; private set; }
+            public Cargo Cargo { get; private set; }
+            public bool EsActivo { get; private set; } = true;
 
-        /// <summary>
-        /// Constructor para inicializar un representante legal con los valores especificados.
-        /// </summary>
-        public RepLegal(DateTime fechaExpedicion, DateTime fechaVencimiento,  string alcaldiaEmisora, int cargoId, Cargo cargo)
-        {
-            FechaExpedicion = fechaExpedicion;
-            FechaVencimiento = fechaVencimiento; 
-            AlcaldiaEmisora = alcaldiaEmisora;
-            CargoId = cargoId;
-            Cargo = cargo ?? throw new ArgumentNullException(nameof(cargo), "El cargo no puede ser nulo.");
-            
-        }     
+            /// <summary>
+            /// Establece la fecha de expedición.
+            /// </summary>
+            public RepLegalBuilder WithFechaExpedicion(DateTime fechaExpedicion)
+            {
+                FechaExpedicion = fechaExpedicion;
+                return this;
+            }
+
+            /// <summary>
+            /// Establece la fecha de vencimiento.
+            /// </summary>
+            public RepLegalBuilder WithFechaVencimiento(DateTime fechaVencimiento)
+            {
+                FechaVencimiento = fechaVencimiento;
+                return this;
+            }
+
+            /// <summary>
+            /// Establece la alcaldía emisora del documento.
+            /// </summary>
+            public RepLegalBuilder WithAlcaldiaEmisora(string alcaldiaEmisora)
+            {
+                AlcaldiaEmisora = alcaldiaEmisora;
+                return this;
+            }
+
+            /// <summary>
+            /// Establece el ID del cargo asociado.
+            /// </summary>
+            public RepLegalBuilder WithCargoId(int cargoId)
+            {
+                CargoId = cargoId;
+                return this;
+            }
+
+            /// <summary>
+            /// Establece el cargo asociado al documento.
+            /// </summary>
+            public RepLegalBuilder WithCargo(Cargo cargo)
+            {
+                Cargo = cargo ?? throw new ArgumentNullException(nameof(cargo), "El cargo no puede ser nulo.");
+                return this;
+            }
+
+            /// <summary>
+            /// Establece si el documento está activo.
+            /// </summary>
+            public RepLegalBuilder WithEsActivo(bool esActivo)
+            {
+                EsActivo = esActivo;
+                return this;
+            }
+
+            /// <summary>
+            /// Crea una nueva instancia de RepLegal.
+            /// </summary>
+            public RepLegal Build()
+            {
+                return new RepLegal(this);
+            }
+        }
     }
 }
-
-

@@ -1,85 +1,43 @@
 using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 
 namespace PhAppUser.Domain.Entities
 {
-    public class EntSalud
+    /// <summary>
+    /// Representa los atributos específicos de EntSalud.
+    /// </summary>
+    public class EntSalud : EntidadPrestadora
     {
         /// <summary>
-        /// Clase encargada de registrar las  entidades de salud
-
+        /// Tipo de cobertura de la afiliación.
         /// </summary>
-        [Key]
-        public int Id { get; set; }
-
-        /// <summary
-        /// Nombre de la entidad de salud
-        /// </summary>
-        [Required]
-        [StringLength(30, MinimumLength =3)]
-        public string Nombre { get; set; } = string.Empty;
+        public string Cobertura { get; set; }
 
         /// <summary>
-        /// Número de Identificación Tributaria (NIT)
-        /// </summary>
-        [Required]
-        [StringLength(20, MinimumLength =2)]
-        public string Nit { get; set;} =string.Empty;
-
-        ///  <summary>
-        ///  Dirección de la entidad de salud
-        /// </summary>
-        [Required]
-        [StringLength(50)]
-        public string Direccion { get; set; } = string.Empty;
-
-        ///  <summary>
-        ///  Teléfono de la entidad de salud
-        /// </summary>
-        [Required]
-        [StringLength(20)]
-        public string Telefono { get; set; } = string.Empty;
-        
-        /// <summary>
-        /// Correo electrónico de contacto
-        /// </summary>
-        [Required]
-        [StringLength(50)]
-        [EmailAddress]
-        public string Correo { get; set; } = string.Empty;
-
-        ///  <summary>
-        ///  Número de afiliación del usuario a esta entidad
-        /// </summary>
-        [Required]
-        [StringLength(30)]
-        public string  NroAfiliacion { get; set; } = string.Empty;
-
-        ///  <summary>
-        ///  Clase navegaciocional con usuario
-        /// </summary>
-        public Usuario? usuario { get; set; }
-
-        ///  <summary>
-        ///  Constructor vacío requerido por EF Core
+        /// Constructor vacío requerido por EF Core.
         /// </summary>
         public EntSalud()
-        {
-
+        { 
+            Cobertura = string.Empty;
         }
 
-        ///  <summary>
-        ///  Constructor con parámetros
+        /// <summary>
+        /// Constructor con parámetros.
         /// </summary>
-        public EntSalud(string nombre, string nit, string direccion, string telefono, string correo, string NroAfiliacion)
+        /// <param name="nombre">Nombre de la entidad prestadora de salud.</param>
+        /// <param name="nit">Número de identificación tributaria.</param>
+        /// <param name="direccion">Dirección de la entidad.</param>
+        /// <param name="telefono">Teléfono de contacto.</param>
+        /// <param name="correo">Correo electrónico.</param>
+        /// <param name="nroAfiliacion">Número de afiliación.</param>
+        /// <param name="fechaInicio">Fecha de inicio de la cobertura.</param>
+        /// <param name="fechaFin">Fecha de finalización de la cobertura.</param>
+        /// <param name="cobertura">Tipo de cobertura.</param>
+        public EntSalud(string nombre, string nit, string direccion, string telefono, string correo, string nroAfiliacion, DateTime fechaInicio, DateTime fechaFin, string cobertura)
+            : base(TipoEntPrestadora.Salud, nombre, nit, direccion, telefono, correo, nroAfiliacion)
         {
-            Nombre = nombre ?? throw new ArgumentNullException(nameof(nombre));
-            Nit = nit ?? throw new ArgumentNullException (nameof(nit));
-            Direccion = direccion ?? throw new ArgumentNullException(nameof(direccion));
-            Telefono = telefono ?? throw new ArgumentNullException(nameof(telefono));
-            Correo = correo ?? throw new ArgumentNullException(nameof(correo));
-            NroAfiliacion = NroAfiliacion ?? throw new ArgumentNullException(nameof(NroAfiliacion));
+            Cobertura = cobertura;
         }
     }
 }
+
+

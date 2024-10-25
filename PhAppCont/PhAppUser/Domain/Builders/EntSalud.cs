@@ -8,24 +8,11 @@ namespace PhAppUser.Domain.Entities
     /// </summary>
     public class EntSalud
     {
-        /// <summary>
-        /// Tipo de identificación tributaria
-        /// </summary>
         public TipoIdenTrib TipoIdenTrib { get; set; }
-
-        /// <summary>
-        /// Número de la identificación tributaria
-        /// </summary>
         public string Numero { get; set; }
-
-        /// <summary>
-        /// Nombre de la entidad prestadora
-        /// </summary>
         public string RazonSocial { get; set; }
 
-        /// <summary>
-        /// Constructor privado para uso del Builder.
-        /// </summary>
+        // Constructor privado para uso exclusivo del Builder.
         private EntSalud() {}
 
         /// <summary>
@@ -42,24 +29,36 @@ namespace PhAppUser.Domain.Entities
                 _entSalud = new EntSalud();
             }
 
+            /// <summary>
+            /// Configura el tipo de identificación tributaria.
+            /// </summary>
             public EntSaludBuilder ConTipoIdenTrib(TipoIdenTrib tipoIdenTrib)
             {
                 _entSalud.TipoIdenTrib = tipoIdenTrib;
                 return this;
             }
 
-            public EntSaludBuilder ConRazonSocial(string razonSocial)
-            {
-                _entSalud.RazonSocial = razonSocial;
-                return this;
-            }
-
+            /// <summary>
+            /// Configura el número de identificación tributaria.
+            /// </summary>
             public EntSaludBuilder ConNumero(string numero)
             {
                 _entSalud.Numero = numero;
                 return this;
             }
 
+            /// <summary>
+            /// Configura la razón social de la entidad prestadora de salud.
+            /// </summary>
+            public EntSaludBuilder ConRazonSocial(string razonSocial)
+            {
+                _entSalud.RazonSocial = razonSocial;
+                return this;
+            }
+
+            /// <summary>
+            /// Construye y devuelve el objeto EntSalud.
+            /// </summary>
             public EntSalud Build()
             {
                 return _entSalud;
@@ -67,4 +66,3 @@ namespace PhAppUser.Domain.Entities
         }
     }
 }
-

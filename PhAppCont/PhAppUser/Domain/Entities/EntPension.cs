@@ -4,9 +4,9 @@ using PhAppUser.Domain.Enums;
 namespace PhAppUser.Domain.Entities
 {
     /// <summary>
-    /// Representa los atributos específicos de EntSalud.
+    /// Representa los atributos específicos de EntPension.
     /// </summary>
-    public class EntSalud
+    public class EntPension
     {
         /// <summary>
         /// Tipo de identificación tributaria
@@ -26,43 +26,43 @@ namespace PhAppUser.Domain.Entities
         /// <summary>
         /// Constructor privado para uso del Builder.
         /// </summary>
-        private EntSalud() {}
+        private EntPension() {}
 
         /// <summary>
-        /// Builder estático para crear una nueva EntSalud.
+        /// Builder estático para crear una nueva EntPension.
         /// </summary>
-        public static EntSaludBuilder Builder() => new EntSaludBuilder();
+        public static EntPensionBuilder Builder() => new EntPensionBuilder();
 
-        public class EntSaludBuilder
+        public class EntPensionBuilder
         {
-            private readonly EntSalud _entSalud;
+            private readonly EntPension _entPension;
 
-            public EntSaludBuilder()
+            public EntPensionBuilder()
             {
-                _entSalud = new EntSalud();
+                _entPension = new EntPension();
             }
 
-            public EntSaludBuilder ConTipoIdenTrib(TipoIdenTrib tipoIdenTrib)
+            public EntPensionBuilder ConTipoIdenTrib(TipoIdenTrib tipoIdenTrib)
             {
-                _entSalud.TipoIdenTrib = tipoIdenTrib;
+                _entPension.TipoIdenTrib = tipoIdenTrib;
                 return this;
             }
 
-            public EntSaludBuilder ConRazonSocial(string razonSocial)
+            public EntPensionBuilder ConRazonSocial(string razonSocial)
             {
-                _entSalud.RazonSocial = razonSocial;
+                _entPension.RazonSocial = razonSocial;
                 return this;
             }
 
-            public EntSaludBuilder ConNumero(string numero)
+            public EntPensionBuilder ConNumero(string numero)
             {
-                _entSalud.Numero = numero;
+                _entPension.Numero = numero;
                 return this;
             }
 
-            public EntSalud Build()
+            public EntPension Build()
             {
-                return _entSalud;
+                return _entPension;
             }
         }
     }

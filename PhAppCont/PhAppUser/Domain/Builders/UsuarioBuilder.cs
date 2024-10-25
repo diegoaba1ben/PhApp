@@ -1,226 +1,161 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using PhAppUser.Domain.Enums;  // Para los enums como TipoContrato, TipoIdenTrib, etc.
+using PhAppUser.Domain.Entities;  // Para las clases EntSalud y EntPension
 
-namespace PhAppUser.Domain.Entities
+namespace PhAppUser.Domain.Builders
 {
-    public class UsuarioBuilder
+    public class Usuario
     {
-        /// <summary>
-        /// Clase que permite crear objetos Usuario de manera flexible
-        /// </summary> Objeto Usuario
-        /// <returns></returns>
-        private Usuario _usuario;
+        // Atributos y propiedades básicas de la clase Usuario...
 
-        public UsuarioBuilder()
+        public TipoContrato TipoContrato { get; set; }
+        public bool? SujetoARetencion { get; set; } // Para Empleado
+        public TipoIdenTrib? TipoIdenTrib { get; set; } // Para PrestadorDeServicios
+        public string NombreSocial { get; set; } // Para PrestadorDeServicios
+
+        public EntSalud Salud { get; set; } // Atributo para la afiliación a salud
+        public EntPension Pension { get; set; } // Atributo para la afiliación a pensión
+
+        // Constructor privado
+        private Usuario() { }
+
+        public static UsuarioBuilder Builder() => new UsuarioBuilder();
+
+        public class UsuarioBuilder
         {
-            ///  <summary>
-            ///  Inicializa una nueva instancia del objeto Usuario.
-            /// </summary>
+            private readonly Usuario _usuario;
 
-            _usuario = new Usuario();
-        }
-
-        public UsuarioBuilder ConId(int id)
-        {
-            /// <summary>
-            /// Establece el ID del usuario.
-            /// </summary>
-            /// <param name="Id">El ID del usuario.</param>
-            /// <returns>la instancia actual de UsuarioBuilder</returns>
-                        if (id <= 0)
-                throw new ArgumentException("El ID no tiene un valor real.");
-            _usuario.Id = id;
-            return this;
-        }
-
-        public UsuarioBuilder ConPrimerNombre(string primerNombre)
-        {
-            /// <summary>
-            /// Establece le primer nombre del usuario
-            /// </summary>
-            /// <param  name="primerNombre">El primer nombre del usuario</param>
-            if (string.IsNullOrWhiteSpace(primerNombre))
-                throw new ArgumentException("El primer nombre no puede estar vacío.");
-            _usuario.PrimerNombre = primerNombre;
-            return this;
-        }
-
-        public UsuarioBuilder ConSegundoNombre(string? segundoNombre)
-        {
-            /// <summary>
-            /// Establece el segundo nombre del usuario, si aplica.
-            /// </summary>
-            _usuario.SegundoNombre = segundoNombre;
-            return this;
-        }
-
-        public UsuarioBuilder ConPrimerApellido(string primerApellido)
-        {
-            /// <summary>
-            /// Establece el primer apellido del usuario
-            /// </summary>
-            if (string.IsNullOrWhiteSpace(primerApellido))
-                throw new ArgumentException("El primer apellido no puede estar vacío.");
-            _usuario.PrimerApellido = primerApellido;
-            return this;
-        }
-
-        public UsuarioBuilder ConSegundoApellido(string? segundoApellido)
-        {
-            /// <summary>
-            /// Establece el segundo apellido del usuario, si aplica.
-            /// </summary>
-            _usuario.SegundoApellido = segundoApellido;
-            return this;
-        }
-
-        public UsuarioBuilder ConTipoIdentificacion(TipoIdentificacion tipoIdentificacion)
-        {
-            /// <summary>
-            /// Establece el tipo de identificación de un usuario
-            /// </summary>
-            _usuario.TipoIdentificacion = tipoIdentificacion;
-            return this;
-        }
-
-        public UsuarioBuilder ConIdentificacionPersonal(string identificacionPersonal)
-        {
-            /// <summary>
-            /// Establece el número de identificación de un usuario.
-            /// </summary>
-            if (string.IsNullOrWhiteSpace(identificacionPersonal))
-                throw new ArgumentException("La identificación es obligatoria.");
-            _usuario.IdentificacionPersonal = identificacionPersonal;
-            return this;
-        }
-
-        public UsuarioBuilder ConTipoIdenTrib(TipoIdenTrib tipoIdenTrib)
-        {
-            /// <summary>
-            /// Establece el tipo de identidad tributario de un usuario.
-            /// </summary>
-            _usuario.TipoIdenTrib = tipoIdenTrib;
-
-            // Si el tipi es "NoAplica", el valor de IdenTrib se establece como vacío
-            if (tipoIdenTrib == TipoIdenTrib.NoAplica)
+            public UsuarioBuilder()
             {
-                _usuario.IdenTrib = string.Empty;
+                _usuario = new Usuario();
             }
-            return this;
-        }
 
-        public UsuarioBuilder ConIdenTrib(string  idenTrib)
-        {
-            /// <summary>
-            /// Establece el número de la identificación tributaria del usuario
-            /// </summary>
-             
-            // Si el tipo de identificación es "NoAplica", no se debería permitir asignar un valor
-            if (_usuario.TipoIdenTrib == TipoIdenTrib.NoAplica)
-                throw new InvalidOperationException("No se puede asignar un valor a la Identificación Tributaria cuando su tipo es No Aplica.");
-            // Valida si el tipo de IdentTrib es nulo o vacio para NIT o RUT
-            if(string.IsNullOrWhiteSpace(idenTrib))
-                throw new  ArgumentException("La identificación tributaria es obligatoria.");
-
-            _usuario.IdenTrib = idenTrib;
-            return this;
-        }
-
-        public UsuarioBuilder ConTipoSegSoc(TipoSegSoc tipoSegSoc)
-        {
-            _usuario.TipoSegSoc =  tipoSegSoc;
-            return this;
-
-        }
-
-        public UsuarioBuilder ConEntidadPrestadora(string entidadPrestadora)
-        {
-            /// <summary>
-            /// Representa el nombre de la entidad prestadora de seguridad social
-            /// OJO DEBEMOS CORREGIR Y QUE PERMITA QUE CUANDO SELECCIONE 1 PUEDA LLENAR EL FORMULARIO
-            /// DE ENTSALUD Y CUANDO SELECCIONE 2 PUEDA LLENAR EL FORMULARIO DE PENSION
-            /// </summary>
-            if (string.IsNullOrWhiteSpace(entidadPrestadora))
+            #region Métodos concatenados para los atributos básicos de Usuario
+            public UsuarioBuilder ConNombresCompletos(string nombresCompletos)
             {
-                throw new ArgumentException("El campo debe contener el nombre de la entidad");
-            }
-             return this;
-        }
-
-        public UsuarioBuilder ConEsContador(bool esContador)
-        {
-            ///  <summary>
-            ///  Representa la calidad o no de un usuario de ser contador
-            /// </summary>
-            _usuario.EsContador = esContador;
-            return this;
-        }
-
-        public UsuarioBuilder ConTarProf(string? tarProf)
-        {
-            /// <summary>
-            /// Representa el número de número de la tarjeta profesional de un usuario contador. 
-            /// </summary>
-            if(string.IsNullOrWhiteSpace(tarProf))
-            {
-                throw new ArgumentException("El campo debe contener un valor numérico");
-                _usuario.TarProf = tarProf;
+                _usuario.NombresCompletos = nombresCompletos;
                 return this;
             }
+
+            public UsuarioBuilder ConApellidosCompletos(string apellidosCompletos)
+            {
+                _usuario.ApellidosCompletos = apellidosCompletos;
+                return this;
+            }
+
+            public UsuarioBuilder ConTipoIdentificacion(TipoIdentificacion tipoIdentificacion)
+            {
+                _usuario.TipoIdentificacion = tipoIdentificacion;
+                return this;
+            }
+
+            public UsuarioBuilder ConIdentificacion(string identificacion)
+            {
+                _usuario.Identificacion = identificacion;
+                return this;
+            }
+
+            public UsuarioBuilder ConDireccion(string direccion)
+            {
+                _usuario.Direccion = direccion;
+                return this;
+            }
+
+            public UsuarioBuilder ConCiudad(string ciudad)
+            {
+                _usuario.Ciudad = ciudad;
+                return this;
+            }
+
+            public UsuarioBuilder ConTelefono(string telefono)
+            {
+                _usuario.Telefono = telefono;
+                return this;
+            }
+
+            public UsuarioBuilder ConEmail(string email)
+            {
+                _usuario.Email = email;
+                return this;
+            }
+            #endregion
+
+            #region Métodos concatenados para el estado del usuario
+            public UsuarioBuilder ConEsActivo(bool esActivo)
+            {
+                _usuario.EsActivo = esActivo;
+
+                if (esActivo)
+                {
+                    _usuario.FechaInactivacion = null;
+                }
+
+                return this;
+            }
+
+            public UsuarioBuilder ConFechaRegistro(DateTime fechaRegistro)
+            {
+                _usuario.FechaRegistro = fechaRegistro;
+                return this;
+            }
+            #endregion
+
+            #region Métodos concatenados para el tipo de contrato y atributos relacionados
+            public UsuarioBuilder ConTipoContrato(TipoContrato tipoContrato)
+            {
+                _usuario.TipoContrato = tipoContrato;
+                return this;
+            }
+
+            public UsuarioBuilder ConSujetoARetencion(bool? sujetoARetencion)
+            {
+                if (_usuario.TipoContrato == TipoContrato.Empleado)
+                {
+                    _usuario.SujetoARetencion = sujetoARetencion;
+                }
+                return this;
+            }
+
+            public UsuarioBuilder ConTipoIdenTrib(TipoIdenTrib? tipoIdenTrib)
+            {
+                if (_usuario.TipoContrato == TipoContrato.PrestadorDeServicios)
+                {
+                    _usuario.TipoIdenTrib = tipoIdenTrib;
+                }
+                return this;
+            }
+
+            public UsuarioBuilder ConNombreSocial(string nombreSocial)
+            {
+                if (_usuario.TipoContrato == TipoContrato.PrestadorDeServicios)
+                {
+                    _usuario.NombreSocial = nombreSocial;
+                }
+                return this;
+            }
+            #endregion
+
+            #region Métodos concatenados para afiliaciones a seguridad social
+            public UsuarioBuilder ConSalud(EntSalud salud)
+            {
+                _usuario.Salud = salud;
+                return this;
+            }
+
+            public UsuarioBuilder ConPension(EntPension pension)
+            {
+                _usuario.Pension = pension;
+                return this;
+            }
+            #endregion
+
+            public Usuario Build()
+            {
+                return _usuario;
+            }
         }
-
-        public UsuarioBuilder ConCiudad(string ciudad)
-        {
-            /// <summary>
-            /// Establece la ciudad de domicilio  del usuario.
-            /// </summary>
-            _usuario.Ciudad = ciudad;
-            return this;
-        }
-
-        public UsuarioBuilder ConDireccion(string direccion)
-        {
-            /// <summary>
-            /// Establece la dirección de domicilio de un usuario
-            /// </summary>
-            _usuario.Direccion = direccion;
-            return this;
-        }
-
-        public UsuarioBuilder ConTelefono(string telefono)
-        {
-            /// <summary>
-            /// Establece el teléfono de contacto de un usuario
-            /// </summary>
-            if (telefono.Length < 7)
-                throw new ArgumentException("El número telefónico debe ser mayor a 7 dígitos.");
-            _usuario.Telefono = telefono;
-            return this;
-        }
-
-        public UsuarioBuilder ConCorreo(string correo)
-        {
-            /// <summary>
-            /// Establece el correo electrónico de contacto del usuario
-            /// </summary>
-
-            if (!new EmailAddressAttribute().IsValid(correo))
-                throw new ArgumentException("Correo inválido.");
-            _usuario.Correo = correo;
-            return this;
-        }
-
-        public UsuarioBuilder ConClave(string clave)
-        {
-            /// <summary>
-            /// Establece la clave o contraseña de acceso al sistema de  un usuario.
-            /// </summary>
-            if (clave.Length < 6)
-                throw new ArgumentException("La contraseña debe tener al menos 6 caracteres.");
-            _usuario.Clave = clave;
-            return this;
-        }
-
-        public Usuario Build() => _usuario;
     }
 }
+
+

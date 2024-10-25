@@ -1,174 +1,130 @@
 using System;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PhAppUser.Domain.Entities
 {
     /// <summary>
-    /// Representa el documento de representación legal asociado a un usuario.
+    /// Entidad que representa los datos de un usuario de tipo Representante Legal (RepLegal).
     /// </summary>
-    public class RepLegal
+    public class RepLegal : Usuario
     {
-        /// <summary>
-        /// Identificador único del representante legal.
-        /// </summary>
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
+        public string CertLegal { get; set; } // Certificación legal para el representante
+        public DateTime FechaInicio { get; set; }
+        public DateTime FechaFinal { get; set; }
 
-        /// <summary>
-        /// Entidad emisora del documento.
-        /// </summary>
-        [Required]
-        [StringLength(50)]  // Longitud máxima de 50 caracteres para asegurar la consistencia
-        public string AlcaldiaEmisora { get; private set; }
-
-        /// <summary>
-        /// Relación con la entidad Cargo que indica el rol asociado a este documento.
-        /// </summary>
-        [Required]
-        public int CargoId { get; private set; }
-
-        [ForeignKey("CargoId")]
-        public Cargo Cargo { get; private set; }
-
-        /// <summary>
-        /// Fecha de expedición del documento de representación legal.
-        /// </summary>
-        [Required]
-        [DataType(DataType.Date)]
-        [CustomValidation(typeof(RepLegal), nameof(ValidarFechaExpedicion))]
-        public DateTime FechaExpedicion { get; private set; }
-
-        /// <summary>
-        /// Fecha de vencimiento del documento.
-        /// </summary>
-        [Required]
-        [DataType(DataType.Date)]
-        public DateTime FechaVencimiento { get; private set; }
-
-        /// <summary>
-        /// Atributo que indica si el Representante Legal está en condición de activo o inactivo.
-        /// </summary>
-        public bool EsActivo { get; set; } = true;
-
-        // Constructor privado para el builder
-        private RepLegal() { }
-
-        /// <summary>
-        /// Constructor privado para inicializar un representante legal a través del builder.
-        /// </summary>
-        /// <param name="builder">El builder que crea la instancia de RepLegal.</param>
-        private RepLegal(RepLegalBuilder builder)
+        // Constructor privado para restringir la creación directa
+        private RepLegal() 
         {
-            FechaExpedicion = builder.FechaExpedicion;
-            FechaVencimiento = builder.FechaVencimiento;
-            AlcaldiaEmisora = builder.AlcaldiaEmisora;
-            CargoId = builder.CargoId;
-            Cargo = builder.Cargo;
-            EsActivo = builder.EsActivo;
+            TipoUsuario = TipoUsuario.RepLegal; // Establecer tipo de usuario como RepLegal de forma rígida
         }
 
-        /// <summary>
-        /// Valida la fecha de expedición.
-        /// </summary>
-        public static ValidationResult ValidarFechaExpedicion(DateTime fechaExpedicion)
+        // Constructor para el uso del Builder
+        public RepLegal(string certLegal, DateTime fechaInicio, DateTime fechaFinal) : this()
         {
-            if (fechaExpedicion > DateTime.Today)
-            {
-                return new ValidationResult("La fecha de expedición no puede ser posterior a la fecha actual");
-            }
-            return ValidationResult.Success ?? new ValidationResult("Validación exitosa");
+            CertLegal = certLegal;
+            FechaInicio = fechaInicio;
+            FechaFinal = fechaFinal;
         }
 
-        /// <summary>
-        /// Calcula los días restantes hasta el vencimiento del documento.
-        /// </summary>
-        public int CalcularDiasRestantes()
+        // Método estático para iniciar el proceso de creación de un RepLegal usando el Builder
+        public static RepLegalBuilder CrearRepLegal()
         {
-            return (FechaVencimiento - DateTime.Now).Days;
+            return new RepLegalBuilder();
         }
 
-        /// <summary>
-        /// Verifica si el documento ya está vencido.
-        /// </summary>
-        public bool EsDocumentoVencido()
-        {
-            return DateTime.Now > FechaVencimiento;
-        }
-
-        /// <summary>
-        /// Builder para crear instancias de RepLegal.
-        /// </summary>
+        // Clase interna RepLegalBuilder para la creación fluida de instancias de RepLegal
         public class RepLegalBuilder
         {
-            public DateTime FechaExpedicion { get; private set; }
-            public DateTime FechaVencimiento { get; private set; }
-            public string AlcaldiaEmisora { get; private set; }
-            public int CargoId { get; private set; }
-            public Cargo Cargo { get; private set; }
-            public bool EsActivo { get; private set; } = true;
+            private readonly RepLegal _repLegal;
 
-            /// <summary>
-            /// Establece la fecha de expedición.
-            /// </summary>
-            public RepLegalBuilder WithFechaExpedicion(DateTime fechaExpedicion)
+            public RepLegalBuilder()
             {
-                FechaExpedicion = fechaExpedicion;
+                _repLegal = new RepLegal(); // Instanciación estricta de RepLegal
+            }
+
+            // Métodos concatenados para atributos base (heredados de Usuario)
+            public RepLegalBuilder ConNombresCompletos(string nombresCompletos)
+            {
+                _repLegal.NombresCompletos = nombresCompletos;
                 return this;
             }
 
-            /// <summary>
-            /// Establece la fecha de vencimiento.
-            /// </summary>
-            public RepLegalBuilder WithFechaVencimiento(DateTime fechaVencimiento)
+            public RepLegalBuilder ConApellidosCompletos(string apellidosCompletos)
             {
-                FechaVencimiento = fechaVencimiento;
+                _repLegal.ApellidosCompletos = apellidosCompletos;
                 return this;
             }
 
-            /// <summary>
-            /// Establece la alcaldía emisora del documento.
-            /// </summary>
-            public RepLegalBuilder WithAlcaldiaEmisora(string alcaldiaEmisora)
+            public RepLegalBuilder ConTipoIdentificacion(TipoIdentificacion tipoIdentificacion)
             {
-                AlcaldiaEmisora = alcaldiaEmisora;
+                _repLegal.TipoIdentificacion = tipoIdentificacion;
                 return this;
             }
 
-            /// <summary>
-            /// Establece el ID del cargo asociado.
-            /// </summary>
-            public RepLegalBuilder WithCargoId(int cargoId)
+            public RepLegalBuilder ConIdentificacion(string identificacion)
             {
-                CargoId = cargoId;
+                _repLegal.Identificacion = identificacion;
                 return this;
             }
 
-            /// <summary>
-            /// Establece el cargo asociado al documento.
-            /// </summary>
-            public RepLegalBuilder WithCargo(Cargo cargo)
+            public RepLegalBuilder ConDireccion(string direccion)
             {
-                Cargo = cargo ?? throw new ArgumentNullException(nameof(cargo), "El cargo no puede ser nulo.");
+                _repLegal.Direccion = direccion;
                 return this;
             }
 
-            /// <summary>
-            /// Establece si el documento está activo.
-            /// </summary>
-            public RepLegalBuilder WithEsActivo(bool esActivo)
+            public RepLegalBuilder ConCiudad(string ciudad)
             {
-                EsActivo = esActivo;
+                _repLegal.Ciudad = ciudad;
                 return this;
             }
 
-            /// <summary>
-            /// Crea una nueva instancia de RepLegal.
-            /// </summary>
+            public RepLegalBuilder ConTelefono(string telefono)
+            {
+                _repLegal.Telefono = telefono;
+                return this;
+            }
+
+            public RepLegalBuilder ConEmail(string email)
+            {
+                _repLegal.Email = email;
+                return this;
+            }
+
+            public RepLegalBuilder ConNombreUsuario(string nombreUsuario)
+            {
+                _repLegal.NombreUsuario = nombreUsuario;
+                return this;
+            }
+
+            public RepLegalBuilder ConPassword(string password)
+            {
+                _repLegal.Password = password;
+                return this;
+            }
+
+            // Métodos concatenados para atributos específicos de RepLegal
+            public RepLegalBuilder ConCertLegal(string certLegal)
+            {
+                _repLegal.CertLegal = certLegal;
+                return this;
+            }
+
+            public RepLegalBuilder ConFechaInicio(DateTime fechaInicio)
+            {
+                _repLegal.FechaInicio = fechaInicio;
+                return this;
+            }
+
+            public RepLegalBuilder ConFechaFinal(DateTime fechaFinal)
+            {
+                _repLegal.FechaFinal = fechaFinal;
+                return this;
+            }
+
+            // Método para devolver el RepLegal creado
             public RepLegal Build()
             {
-                return new RepLegal(this);
+                return _repLegal;
             }
         }
     }

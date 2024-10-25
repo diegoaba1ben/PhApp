@@ -1,73 +1,108 @@
-using  System;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace PhAppUser.Domain.Entities
 {
     /// <summary>
-    /// Representa una categoría o rol en el sistema.
+    /// Representa una área en el sistema, agrupando cargos bajo una temática específica.
     /// </summary>
-    public class Categoria
+    public class Area
     {
-        /// <summary>
-        /// Identificador único de la categoría.
-        /// </summary>
-        [Key]
-        public int Id { get; set; }
+        #region Propiedades de Área
 
         /// <summary>
-        /// Nombre de la categoría.
+        /// Identificador único del área.
         /// </summary>
-        [Required]
-        [StringLength(100)]
-        public string Nombre { get; set; } // Ejemplo: "Financiera", "Administrativa", etc.
+        public int Id { get; private set; }
 
         /// <summary>
-        /// Descripción de la categoría.
+        /// Nombre del área, como "Financiera", "Administrativa", etc.
         /// </summary>
-        public string Descripcion { get; set; }
+        public string Nombre { get; private set; }
 
         /// <summary>
-        /// Define si la categoría tiene responsabilidades de representación legal.
+        /// Descripción del área.
         /// </summary>
-        public bool EsRepLegal { get; set; } = false;
+        public string Descripcion { get; private set; }
 
-        ///  <summary>
-        ///  Constructor privado para forzar el uso del Builder
+        /// <summary>
+        /// Indica si el área tiene responsabilidades de representación legal.
         /// </summary>
-        private Categoria(){ }
+        public bool EsRepLegal { get; private set; } = false;
 
-        public static CategoriaBuilder Builder() => new CategoriaBuilder();
+        /// <summary>
+        /// Colección de cargos asociados a esta área.
+        /// </summary>
+        public ICollection<Cargo> Cargos { get; private set; }
 
-        public class CategoriaBuilder
+        #endregion
+
+        // Constructor privado para asegurar que solo se pueda crear a través del builder.
+        private Area()
         {
-            private Categoria _categoria;
+            Cargos = new List<Cargo>();
+        }
 
-            public CategoriaBuilder()
+        /// <summary>
+        /// Inicia el builder para crear una nueva instancia de Area.
+        /// </summary>
+        public static AreaBuilder Builder() => new AreaBuilder();
+
+        public class AreaBuilder
+        {
+            private readonly Area _area;
+
+            public AreaBuilder()
             {
-                _categoria = new Categoria();
+                _area = new Area();
             }
-            public CategoriaBuilder ConNombre(string nombre)
+
+            #region Métodos concatenados para asignar propiedades
+
+            public AreaBuilder ConId(int id)
             {
-                _categoria.Nombre = nombre;
+                _area.Id = id;
                 return this;
             }
-            public CategoriaBuilder ConDescripcion(string descripcion)
+
+            public AreaBuilder ConNombre(string nombre)
             {
-                _categoria.Descripcion = descripcion;
+                _area.Nombre = nombre;
                 return this;
             }
-            public CategoriaBuilder ConEsRepLegal(bool esRepLegal)
+
+            public AreaBuilder ConDescripcion(string descripcion)
             {
-                _categoria.EsRepLegal = esRepLegal;
+                _area.Descripcion = descripcion;
                 return this;
             }
-            public Categoria Build()
+
+            public AreaBuilder ConEsRepLegal(bool esRepLegal)
             {
-                return _categoria;
+                _area.EsRepLegal = esRepLegal;
+                return this;
+            }
+
+            public AreaBuilder ConCargo(Cargo cargo)
+            {
+                _area.Cargos.Add(cargo);
+                return this;
+            }
+
+            #endregion
+
+            /// <summary>
+            /// Construye y retorna la instancia de Area.
+            /// </summary>
+            public Area Build()
+            {
+                return _area;
             }
         }
     }
 }
+
 
 
 
